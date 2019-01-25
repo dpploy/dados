@@ -62,8 +62,8 @@ class CortixDriver():
         self.__log.info('initializing an object of CortixDriver()')
 
         # Guest library module: Danae
-        self.my_module = Danae( slot_id, input_full_path_file_name, work_dir, ports,
-                                cortix_start_time, cortix_final_time )
+        self.__danae = Danae( slot_id, input_full_path_file_name, work_dir, ports,
+                              cortix_start_time, cortix_final_time )
 
         self.__time_stamp = None  # temporary
 
@@ -77,8 +77,7 @@ class CortixDriver():
 
         self.__log_debug(cortix_time, 'call_ports')
 
-        # uncomment
-        # self.my_module.call_ports( cortix_time )
+        self.__danae.call_ports( cortix_time )
 
         self.__log_debug(cortix_time, 'call_ports')
 
@@ -93,7 +92,7 @@ class CortixDriver():
         self.__log_debug(cortix_time, 'execute')
 
         # uncomment
-        # self.my_module.execute( cortix_time, timeStep )
+        self.__danae.execute( cortix_time, timeStep )
 
         self.__log_debug(cortix_time, 'execute')
 

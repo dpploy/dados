@@ -106,9 +106,6 @@ class Danae():
 # Private helper functions (internal use: __)
 
  def __provide_data( self, provide_port_name=None, at_time=0.0 ):
-  '''
-  Example of how this internal method would look like
-  '''
 
 # Access the port file
   port_file = self.__get_port_file( provide_port_name = provide_port_name )
@@ -121,9 +118,6 @@ class Danae():
 #---------------------- end def __provide_data():---------------------------------
 
  def __use_data( self, use_port_name=None, at_time=0.0 ):
-  '''
-  Example of how this internal method would look like
-  '''
 
 # Access the port file
   port_file = self.__get_port_file( use_port_name = use_port_name )
@@ -183,4 +177,4 @@ class Danae():
    return port_file
 #---------------------- end def __get_port_file():--------------------------------
 
-#======================= end class MyModule: =====================================
+#======================= end class Danae: ========================================
