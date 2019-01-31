@@ -8,16 +8,16 @@
 # Licensed under the GNU General Public License v. 3, please see LICENSE file.
 # https://www.gnu.org/licenses/gpl-3.0.txt
 '''
-Danae module in Cortix
+Dados module in Cortix
 '''
 #*********************************************************************************
 import os, sys, io, time
 import logging
 #*********************************************************************************
 
-class Danae():
+class Dados():
  r'''
-  Danae module for Cortix
+  Dados module for Cortix
  '''
 
  def __init__( self,
@@ -44,8 +44,8 @@ class Danae():
          type(cortix_time_unit)
 
   # Logging
-  self.__log = logging.getLogger('launcher-danae_'+str(slot_id)+'.cortix_driver.danae')
-  self.__log.info('initializing an object of Danae()')
+  self.__log = logging.getLogger('launcher-dados_'+str(slot_id)+'.cortix_driver.dados')
+  self.__log.info('initializing an object of Dados()')
 
 #.................................................................................
 # Member data 
@@ -177,4 +177,4 @@ class Danae():
    return port_file
 #---------------------- end def __get_port_file():--------------------------------
 
-#======================= end class Danae: ========================================
+#======================= end class Dados: ========================================

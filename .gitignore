@@ -5,6 +5,7 @@ createtags
 __pycache__/
 *.py[cod]
 *$py.class
+vault/
 
 # C extensions
 *.so

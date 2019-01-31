@@ -8,7 +8,7 @@
 # Licensed under the GNU General Public License v. 3, please see LICENSE file.
 # https://www.gnu.org/licenses/gpl-3.0.txt
 '''
-Cortix driver for Danae.
+Cortix driver for Dados.
 '''
 #*************************************************************************
 import os
@@ -19,7 +19,7 @@ import datetime
 import logging
 
 # uncomment
-from .danae import Danae
+from .dados import Dados
 #*************************************************************************
 
 class CortixDriver():
@@ -57,12 +57,12 @@ class CortixDriver():
             cortix_time_unit, str), '-> time unit type %r is invalid.' % type(cortix_time_unit)
 
         # Logging
-        self.__log = logging.getLogger( 'launcher-danae' + str(slot_id) +
+        self.__log = logging.getLogger( 'launcher-dados' + str(slot_id) +
                                         '.cortixdriver')
         self.__log.info('initializing an object of CortixDriver()')
 
-        # Guest library module: Danae
-        self.__danae = Danae( slot_id, input_full_path_file_name, work_dir, ports,
+        # Guest library module: Dados
+        self.__dados = Dados( slot_id, input_full_path_file_name, work_dir, ports,
                               cortix_start_time, cortix_final_time )
 
         self.__time_stamp = None  # temporary
@@ -77,7 +77,7 @@ class CortixDriver():
 
         self.__log_debug(cortix_time, 'call_ports')
 
-        self.__danae.call_ports( cortix_time )
+        self.__dados.call_ports( cortix_time )
 
         self.__log_debug(cortix_time, 'call_ports')
 
@@ -92,7 +92,7 @@ class CortixDriver():
         self.__log_debug(cortix_time, 'execute')
 
         # uncomment
-        self.__danae.execute( cortix_time, timeStep )
+        self.__dados.execute( cortix_time, timeStep )
 
         self.__log_debug(cortix_time, 'execute')
 
