@@ -29,6 +29,11 @@
     <port type='provide' mode='file.xml' multiplicity='1'>state</port>
     <port type='provide' mode='file.dat' multiplicity='1'>output</port>
 
+    <port_doc port_name='mc-118'>
+        Analog to digital data acquisition for the Raspberry Pi board computer
+        using the MCC-118 (Measurement Computing https://mccdaq.com).
+    </port_doc>
+
     <diagram> 
    ..................................................................
    .               _____  ___  _____  _____    __                   .
@@ -39,7 +44,9 @@
    .____________      |...........|...........|                     .
    .|input-self| ---  | input     | rs-232    |                     .
    .------------      |...........|...........|                     .
-   . provide-like     |           | state     |       output port   .
+   . provide-like     |           | mc-118    |                     .
+   .                  |...........|...........|                     .
+   .                  |           | state     |      output port    .
    .                  |...........|...........|     _____________   .
    .                  |           | output    | --- |output-self|   .
    .                  =========================     -------------   .

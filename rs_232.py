@@ -8,18 +8,16 @@
 # Licensed under the GNU General Public License v. 3, please see LICENSE file.
 # https://www.gnu.org/licenses/gpl-3.0.txt
 '''
-Dados module in Cortix
+RS-232 serials port communication class
 '''
 #*********************************************************************************
 import os, sys, io, time
 import logging
-
-import RS_232
 #*********************************************************************************
 
-class Dados():
+class RS_232():
     r'''
-    Dados module for Cortix
+    RS-232 class for Dados
     '''
 
 #*********************************************************************************
@@ -71,27 +69,11 @@ class Dados():
 
         #fin = open(input_full_path_file_name,'r')
 
-        #self.__ir_7040 = RS_232(arguments )
-
         return
 
 #*********************************************************************************
 # Public member functions
 #*********************************************************************************
-
-    def call_ports( self, cortix_time=0.0 ):
-        '''
-        Developer must implement this method.
-        Transfer data at cortix_time
-        '''
-
-        # provide data using the 'provide-port-name' of the module
-        #self.__provide_data( provide_port_name='provide-port-name', at_time=cortix_time )
-
-        # use data using the 'use-port-name' of the module
-        #self.__use_data( use_port_name='use-port-name', at_time=cortix_time )
-
-        return
 
     def execute( self, cortix_time=0.0, cortix_time_step=0.0 ):
         '''
@@ -102,8 +84,6 @@ class Dados():
         s = 'execute('+str(round(cortix_time,2))+'[min]): '
         self.__log.debug(s)
 
-        #ir_7040 = RS_232(arguments )
-
         # Developer implements helper method, for example
         #self.__evolve( self, cortix_time, cortix_time_step ):
 
@@ -113,75 +93,5 @@ class Dados():
 # Private helper functions (internal use: __)
 #*********************************************************************************
 
-    def __provide_data( self, provide_port_name=None, at_time=0.0 ):
-
-        # Access the port file
-        port_file = self.__get_port_file( provide_port_name = provide_port_name )
-
-        # Provide data to port files
-        #if provide_port_name == 'provide-port-name' and port_file is not None: 
-        #   self.__provide_mymodule_method( port_file, at_time )
-
-        return
-
-    def __use_data( self, use_port_name=None, at_time=0.0 ):
-
-        # Access the port file
-        port_file = self.__get_port_file( use_port_name = use_port_name )
-
-        # Use data from port file
-        #if use_port_name == 'use-port-name' and port_file is not None:  
-        #   self.__use_mymodule_method( port_file, at_time )
-
-        return
-
-    def __get_port_file( self, use_port_name=None, provide_port_name=None ):
-        '''
-        This may return a None port_file
-        '''
-
-        port_file = None
-
-        #..........
-        # Use ports
-        #..........
-        if use_port_name is not None:
-
-            assert provide_port_name is None
-
-            for port in self.__ports:
-               (portName,portType,thisPortFile) = port
-               if portName == use_port_name and portType == 'use': 
-                   port_file = thisPortFile
-
-            if port_file is None: return None
-
-            max_n_trials = 50
-            n_trials     = 0
-            while os.path.isfile(port_file) is False and n_trials <= max_n_trials:
-                n_trials += 1
-                time.sleep(0.1)
-
-            if n_trials > max_n_trials:
-                s = '__get_port_file(): waited ' + str(n_trials) + ' trials for port: '\
-                        + port_file
-                self.__log.warn(s)
-
-            assert os.path.isfile(port_file) is True, \
-                    'port_file %r not available; stop.' % port_file
-
-        #..............
-        # Provide ports
-        #..............
-        if provide_port_name is not None:
-
-            assert use_port_name is None
-
-           for port in self.__ports:
-                (portName,portType,thisPortFile) = port
-            if portName == provide_port_name and portType == 'provide':
-                port_file = thisPortFile
-
-        return port_file
 
 #======================= end class Dados: ========================================
