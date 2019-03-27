@@ -68,7 +68,6 @@ class CortixDriver():
         self.__time_stamp = None  # temporary
 
         return
-#---------------------- end def __init__():-------------------------------
 
     def call_ports(self, cortix_time=0.0):
         '''
@@ -82,7 +81,6 @@ class CortixDriver():
         self.__log_debug(cortix_time, 'call_ports')
 
         return
-#---------------------- end def call_ports():-----------------------------
 
     def execute(self, cortix_time=0.0, timeStep=0.0):
         '''
@@ -97,10 +95,10 @@ class CortixDriver():
         self.__log_debug(cortix_time, 'execute')
 
         return
-#---------------------- end def execute():--------------------------------
 
 #*************************************************************************
 # Private helper functions (internal use: __)
+#*************************************************************************
 
     def __log_debug(self, cortix_time=0.0, caller='null-function-name'):
 
@@ -134,6 +132,5 @@ class CortixDriver():
                 self.__log.debug(s)
 
         return
-#---------------------- end def __log_debug():----------------------------
 
 #====================== end class CortixDriver: ==========================
