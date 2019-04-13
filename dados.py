@@ -102,10 +102,7 @@ class Dados():
         s = 'execute('+str(round(cortix_time,2))+'[min]): '
         self.__log.debug(s)
 
-        #ir_7040 = RS_232(arguments )
-
-        # Developer implements helper method, for example
-        #self.__evolve( self, cortix_time, cortix_time_step ):
+        ir_7040 = RS_232.create_instance()
 
         return
 

@@ -72,7 +72,6 @@ class Comm:
             splitline=line.split()
             splitline.append(self.timestamp)
             print(line)
-            print(splitline)
             for n in range(2,8):
                 splitline[n] = splitline[n][0]+'.'+splitline[n][1:3]+'e'+splitline[n][3:]
             filename='data/Stack_monitor_data_{}.csv'.format(str(datetime.datetime.now())[:10])
@@ -85,7 +84,8 @@ class Comm:
             for conn in self.socket_list:
                 try:
                     conn.send(padding.encode())
-                except Exception as e:
+                
+                except socket.BrokenPipeError as e:
                     print(traceback.print_exc())
                     conn.close()
                     del self.socket_list[c]

@@ -7,15 +7,13 @@ import traceback
 import time
 
 s = socket.socket()             # Create a socket object
-host = '10.253.90.164'          # Get local machine name
+host = '127.0.1.1'              # Get local machine name
 port = 60000                    # Reserve a port for your service.
 
 s.connect((host, port))
-for n in range(2):
-    data = s.recv(40).decode().split(', ')
-    #print(data)
-    port=int(data[1])
-    host=data[3]
+data = s.recv(40).decode().split(', ')
+port=int(data[1])
+host=data[3]
 s.close()
 
 print('port name = {}, host name= {}'.format(port,host))
@@ -27,12 +25,13 @@ b1=[deque(),deque()]
 
 fig,ax=plt.subplots(1,1)
 plt.ion()
-#plt.show()
 ax.xaxis_date()
 fig.autofmt_xdate(rotation=45)
 plt.gcf().autofmt_xdate()
 myfmt = mdates.DateFormatter('%Y-%m-%d %H:%M:%S')
 plt.gca().xaxis.set_major_formatter(myfmt)
+ax.set_ylabel('Radiation Level (mR)')
+ax.set_title('Intelligent Ratemeter 7040 Data')
 ax.relim()
 ax.grid()
 while True:
