@@ -14,7 +14,8 @@ Dados module in Cortix
 import os, sys, io, time
 import logging
 
-import RS_232
+from cortix.src.utils.xmltree import XMLTree
+#import RS_232
 #*********************************************************************************
 
 class Dados():
@@ -29,11 +30,13 @@ class Dados():
     def __init__( self,
                   slot_id,
                   input_full_path_file_name,
+                  manifest_full_path_file_name,
                   work_dir,
                   ports = list(),
                   cortix_start_time = 0.0,
                   cortix_final_time = 0.0,
-                  cortix_time_unit  = None 
+                  cortix_time_step = 0.0,
+                  cortix_time_unit = None 
                 ):
 
         # Sanity test
@@ -44,12 +47,18 @@ class Dados():
                 type(cortix_start_time)
         assert isinstance(cortix_final_time, float), '-> time type %r is invalid.' % \
                 type(cortix_final_time)
+        assert isinstance(cortix_time_step, float), '-> time step type %r is invalid.' % \
+                type(cortix_time_step)
         assert isinstance(cortix_time_unit, str), '-> time type %r is invalid.' % \
                 type(cortix_time_unit)
 
         # Logging
         self.__log = logging.getLogger('launcher-dados_'+str(slot_id)+'.cortix_driver.dados')
         self.__log.info('initializing an object of Dados()')
+
+        # Read the manisfest
+        self.__read_manifest( manifest_full_path_file_name )
+        self.__log.info(self.__port_diagram)
 
         # Member data 
         self.__slot_id = slot_id
@@ -71,7 +80,9 @@ class Dados():
 
         #fin = open(input_full_path_file_name,'r')
 
-        #self.__ir_7040 = RS_232(arguments )
+        # if a serial port is wanted create this variable
+        # add conditional to create this or not
+        #self.__serial_232_port = RS_232()
 
         return
 
@@ -177,11 +188,83 @@ class Dados():
 
             assert use_port_name is None
 
-           for port in self.__ports:
+            for port in self.__ports:
                 (portName,portType,thisPortFile) = port
             if portName == provide_port_name and portType == 'provide':
                 port_file = thisPortFile
 
         return port_file
+
+    def __read_manifest( self, xml_tree_file ):
+        '''
+        Parse the manifest
+        '''
+
+        assert isinstance(xml_tree_file, str)
+
+        # Read the manifest 
+        xml_tree = XMLTree( xml_tree_file=xml_tree_file )
+
+        assert xml_tree.get_node_tag() == 'module_manifest'
+
+        assert xml_tree.get_node_attribute('name') == 'dados'
+
+        # List of (port_name, port_type, port_mode, port_multiplicity)
+        __ports = list()
+
+        self.__port_diagram = 'null-module-port-diagram'
+
+        # Get manifest data  
+        for child in xml_tree.get_node_children():
+            (elem, tag, attributes, text) = child
+
+            if tag == 'port':
+
+                text = text.strip()
+
+                assert len(attributes) == 3, "only <= 3 attributes allowed."
+
+                tmp = dict()  # store port name and three attributes
+
+                for attribute in attributes:
+                    key = attribute[0].strip()
+                    val = attribute[1].strip()
+
+                    if key == 'type':
+                        assert val == 'use' or val == 'provide' or val == 'input' or \
+                            val == 'output', 'port attribute value invalid.'
+                        tmp['port_name'] = text  # port_name
+                        tmp['port_type'] = val   # port_type
+                    elif key == 'mode':
+                        file_value = val.split('.')[0]
+                        assert file_value == 'file' or file_value == 'directory',\
+                            'port attribute value invalid.'
+                        tmp['port_mode'] = val
+                    elif key == 'multiplicity':
+                        tmp['port_multiplicity'] = int(val)  # port_multiplicity
+                    else:
+                        assert False, 'invalid port attribute: %r=%r. fatal.'%\
+                                (key,val)
+
+                assert len(tmp) == 4
+                store = (tmp['port_name'], tmp['port_type'], tmp['port_mode'],
+                         tmp['port_multiplicity'])
+
+                # (port_name, port_type, port_mode, port_multiplicity)
+                __ports.append(store)
+
+                # clear
+                tmp   = None
+                store = None
+
+            if tag == 'diagram':
+
+                self.__port_diagram = text
+
+            if tag == 'ascii_art':
+
+                self.__ascii_art = text
+
+        return
 
 #======================= end class Dados: ========================================

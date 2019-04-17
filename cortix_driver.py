@@ -21,22 +21,25 @@ import logging
 # uncomment
 from .dados import Dados
 #*************************************************************************
-
 class CortixDriver():
     '''
      Cortix driver for guest modules.
     '''
 
+#*********************************************************************************
+# Construction
+#*********************************************************************************
+
     def __init__(self,
                  slot_id,
                  input_full_path_file_name,
-                 exec_full_path_file_name,
+                 manifest_full_path_file_name,
                  work_dir,
                  ports=list(),
                  cortix_start_time=0.0,
                  cortix_final_time=0.0,
-                 cortix_time_unit=None,
-                 cortix_time_step=0.0
+                 cortix_time_step=0.0,
+                 cortix_time_unit=None
                  ):
 
         # Sanity test
@@ -62,12 +65,18 @@ class CortixDriver():
         self.__log.info('initializing an object of CortixDriver()')
 
         # Guest library module: Dados
-        self.__dados = Dados( slot_id, input_full_path_file_name, work_dir, ports,
-                              cortix_start_time, cortix_final_time )
+        self.__dados = Dados( slot_id,
+                input_full_path_file_name, manifest_full_path_file_name, work_dir,
+                ports,
+                cortix_start_time, cortix_final_time, cortix_time_step, cortix_time_unit )
 
-        self.__time_stamp = None  # temporary
+        self.__time_stamp = None #  leave this here
 
         return
+
+#*********************************************************************************
+# Public member functions
+#*********************************************************************************
 
     def call_ports(self, cortix_time=0.0):
         '''
@@ -132,5 +141,4 @@ class CortixDriver():
                 self.__log.debug(s)
 
         return
-
 #====================== end class CortixDriver: ==========================
