@@ -30,7 +30,7 @@ class Dados():
     def __init__( self,
                   slot_id,
                   input_full_path_file_name,
-                  manifest_full_path_file_name,
+                  manifesto_full_path_file_name,
                   work_dir,
                   ports = list(),
                   cortix_start_time = 0.0,
@@ -57,7 +57,7 @@ class Dados():
         self.__log.info('initializing an object of Dados()')
 
         # Read the manisfest
-        self.__read_manifest( manifest_full_path_file_name )
+        self.__read_manifesto( manifesto_full_path_file_name )
         self.__log.info(self.__port_diagram)
 
         # Member data 
@@ -195,17 +195,17 @@ class Dados():
 
         return port_file
 
-    def __read_manifest( self, xml_tree_file ):
+    def __read_manifesto( self, xml_tree_file ):
         '''
-        Parse the manifest
+        Parse the manifesto
         '''
 
         assert isinstance(xml_tree_file, str)
 
-        # Read the manifest 
+        # Read the manifesto
         xml_tree = XMLTree( xml_tree_file=xml_tree_file )
 
-        assert xml_tree.get_node_tag() == 'module_manifest'
+        assert xml_tree.get_node_tag() == 'module_manifesto'
 
         assert xml_tree.get_node_attribute('name') == 'dados'
 
@@ -214,7 +214,7 @@ class Dados():
 
         self.__port_diagram = 'null-module-port-diagram'
 
-        # Get manifest data  
+        # Get manifesto data  
         for child in xml_tree.get_node_children():
             (elem, tag, attributes, text) = child
 

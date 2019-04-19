@@ -10,7 +10,7 @@
 # Licensed under the University of Massachusetts Lowell LICENSE:
 # https://github.com/dpploy/cortix/blob/master/LICENSE.txt
 -->
-<module_manifest name='dados' version='0.0'>
+<module_manifesto name='dados' version='0.0'>
 
  <!-- Ports have four types: * use, * provide, * input, * output -->
  <!-- The *input*, and *output* types allow for a module to self-connect. 
@@ -63,4 +63,4 @@
     ____________________________________
     </ascii_art>
 
-</module_manifest>
+</module_manifesto>
