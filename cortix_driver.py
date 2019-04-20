@@ -21,22 +21,25 @@ import logging
 # uncomment
 from .dados import Dados
 #*************************************************************************
-
 class CortixDriver():
     '''
      Cortix driver for guest modules.
     '''
 
+#*********************************************************************************
+# Construction
+#*********************************************************************************
+
     def __init__(self,
                  slot_id,
                  input_full_path_file_name,
-                 exec_full_path_file_name,
+                 manifesto_full_path_file_name,
                  work_dir,
                  ports=list(),
                  cortix_start_time=0.0,
                  cortix_final_time=0.0,
-                 cortix_time_unit=None,
-                 cortix_time_step=0.0
+                 cortix_time_step=0.0,
+                 cortix_time_unit=None
                  ):
 
         # Sanity test
@@ -46,15 +49,19 @@ class CortixDriver():
             ports, list), '-> ports type %r is invalid.' % type(ports)
         assert len(ports) > 0
         assert isinstance(
-            cortix_start_time, float), '-> time type %r is invalid.' % type(cortix_start_time)
+            cortix_start_time, float), '-> time type %r is invalid.' % \
+                    type(cortix_start_time)
         assert isinstance(
-            cortix_final_time, float), '-> time type %r is invalid.' % type(cortix_final_time)
+            cortix_final_time, float), '-> time type %r is invalid.' % \
+                    type(cortix_final_time)
 
         assert isinstance(
-            cortix_time_step, float), '-> time step type %r is invalid.' % type(cortix_time_step)
+            cortix_time_step, float), '-> time step type %r is invalid.' % \
+                    type(cortix_time_step)
 
         assert isinstance(
-            cortix_time_unit, str), '-> time unit type %r is invalid.' % type(cortix_time_unit)
+            cortix_time_unit, str), '-> time unit type %r is invalid.' % \
+                    type(cortix_time_unit)
 
         # Logging
         self.__log = logging.getLogger( 'launcher-dados' + str(slot_id) +
@@ -62,12 +69,18 @@ class CortixDriver():
         self.__log.info('initializing an object of CortixDriver()')
 
         # Guest library module: Dados
-        self.__dados = Dados( slot_id, input_full_path_file_name, work_dir, ports,
-                              cortix_start_time, cortix_final_time )
+        self.__dados = Dados( slot_id,
+                input_full_path_file_name, manifesto_full_path_file_name, work_dir,
+                ports,
+                cortix_start_time, cortix_final_time, cortix_time_step, cortix_time_unit )
 
-        self.__time_stamp = None  # temporary
+        self.__time_stamp = None #  leave this here
 
         return
+
+#*********************************************************************************
+# Public member functions
+#*********************************************************************************
 
     def call_ports(self, cortix_time=0.0):
         '''
@@ -89,7 +102,6 @@ class CortixDriver():
 
         self.__log_debug(cortix_time, 'execute')
 
-        # uncomment
         self.__dados.execute( cortix_time, timeStep )
 
         self.__log_debug(cortix_time, 'execute')
@@ -132,5 +144,4 @@ class CortixDriver():
                 self.__log.debug(s)
 
         return
-
 #====================== end class CortixDriver: ==========================
