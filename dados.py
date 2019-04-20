@@ -16,7 +16,9 @@ import logging
 
 from cortix.src.utils.xmltree import XMLTree
 from .rs_232 import RS_232
+
 from .dados_simulator import simulator
+
 #*********************************************************************************
 
 class Dados():
@@ -57,7 +59,7 @@ class Dados():
         self.__log = logging.getLogger('launcher-dados_'+str(slot_id)+'.cortix_driver.dados')
         self.__log.info('initializing an object of Dados()')
 
-        # Read the manisfest
+        # Read the manisfesto
         self.__read_manifesto( manifesto_full_path_file_name )
         self.__log.info(self.__port_diagram)
 
@@ -68,11 +70,12 @@ class Dados():
         if work_dir[-1] != '/': work_dir = work_dir + '/'
         self.__wrkDir = work_dir
 
-        # Signal to start operation
-        self.__goSignal = True    # start operation immediately
-        for port in self.__ports: # if there is a signal port, start operation accordingly
-            (portName,portType,thisPortFile) = port
-            if portName == 'go-signal' and portType == 'use': self.__goSignal = False
+        # Start external devices 
+        for port in self.__ports: # if there is a connected device, start its port
+            (portName,portType,thisPortHardware) = port
+            if portName == 'rs-232' and portType == 'use':
+                device_name = thisPortHardware.split('/')[-1]
+                self.__rs_232 = RS_232( device_name = device_name )
 
         self.__setup_time = 1.0  # min; a delay time before starting to run
 
@@ -83,6 +86,7 @@ class Dados():
 
         # if a serial port is wanted create this variable
         # add conditional to create this or not
+
         #self.__serial_232_port = RS_232()
 
         return
@@ -114,9 +118,9 @@ class Dados():
         s = 'execute('+str(round(cortix_time,2))+'[min]): '
         self.__log.debug(s)
 
-        #ir_7040 = RS_232()
-        #ir7040.create_instance()
-        simulator()
+
+        #simulator()
+
         return
 
 #*********************************************************************************
@@ -230,14 +234,14 @@ class Dados():
                     val = attribute[1].strip()
 
                     if key == 'type':
-                        assert val == 'use' or val == 'provide' or val == 'input' or \
+                        assert val == 'use' or val == 'provide' or val == 'input' or\
                             val == 'output', 'port attribute value invalid.'
                         tmp['port_name'] = text  # port_name
                         tmp['port_type'] = val   # port_type
                     elif key == 'mode':
                         file_value = val.split('.')[0]
-                        assert file_value == 'file' or file_value == 'directory',\
-                            'port attribute value invalid.'
+                        assert file_value == 'file' or file_value == 'directory' or\
+                               file_value == 'hardware','port attribute value invalid.'
                         tmp['port_mode'] = val
                     elif key == 'multiplicity':
                         tmp['port_multiplicity'] = int(val)  # port_multiplicity
