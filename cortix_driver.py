@@ -49,15 +49,19 @@ class CortixDriver():
             ports, list), '-> ports type %r is invalid.' % type(ports)
         assert len(ports) > 0
         assert isinstance(
-            cortix_start_time, float), '-> time type %r is invalid.' % type(cortix_start_time)
+            cortix_start_time, float), '-> time type %r is invalid.' % \
+                    type(cortix_start_time)
         assert isinstance(
-            cortix_final_time, float), '-> time type %r is invalid.' % type(cortix_final_time)
+            cortix_final_time, float), '-> time type %r is invalid.' % \
+                    type(cortix_final_time)
 
         assert isinstance(
-            cortix_time_step, float), '-> time step type %r is invalid.' % type(cortix_time_step)
+            cortix_time_step, float), '-> time step type %r is invalid.' % \
+                    type(cortix_time_step)
 
         assert isinstance(
-            cortix_time_unit, str), '-> time unit type %r is invalid.' % type(cortix_time_unit)
+            cortix_time_unit, str), '-> time unit type %r is invalid.' % \
+                    type(cortix_time_unit)
 
         # Logging
         self.__log = logging.getLogger( 'launcher-dados' + str(slot_id) +
@@ -98,7 +102,6 @@ class CortixDriver():
 
         self.__log_debug(cortix_time, 'execute')
 
-        # uncomment
         self.__dados.execute( cortix_time, timeStep )
 
         self.__log_debug(cortix_time, 'execute')
