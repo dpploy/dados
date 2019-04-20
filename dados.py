@@ -15,7 +15,8 @@ import os, sys, io, time
 import logging
 
 from cortix.src.utils.xmltree import XMLTree
-#import RS_232
+from .rs_232 import RS_232
+from .dados_simulator import simulator
 #*********************************************************************************
 
 class Dados():
@@ -113,8 +114,9 @@ class Dados():
         s = 'execute('+str(round(cortix_time,2))+'[min]): '
         self.__log.debug(s)
 
-        ir_7040 = RS_232.create_instance()
-
+        #ir_7040 = RS_232()
+        #ir7040.create_instance()
+        simulator()
         return
 
 #*********************************************************************************
