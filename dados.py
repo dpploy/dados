@@ -13,168 +13,255 @@ Dados module in Cortix
 #*********************************************************************************
 import os, sys, io, time
 import logging
+
+from cortix.src.utils.xmltree import XMLTree
+#import RS_232
 #*********************************************************************************
 
 class Dados():
- r'''
-  Dados module for Cortix
- '''
+    r'''
+    Dados module for Cortix
+    '''
 
- def __init__( self,
-               slot_id,
-               input_full_path_file_name,
-               work_dir,
-               ports = list(),
-               cortix_start_time = 0.0,
-               cortix_final_time = 0.0,
-               cortix_time_unit  = None 
-             ):
+#*********************************************************************************
+# Construction 
+#*********************************************************************************
 
-#.................................................................................
-# Sanity test
+    def __init__( self,
+                  slot_id,
+                  input_full_path_file_name,
+                  manifesto_full_path_file_name,
+                  work_dir,
+                  ports = list(),
+                  cortix_start_time = 0.0,
+                  cortix_final_time = 0.0,
+                  cortix_time_step = 0.0,
+                  cortix_time_unit = None 
+                ):
 
-  assert isinstance(slot_id, int), '-> slot_id type %r is invalid.' % type(slot_id)
-  assert isinstance(ports, list), '-> ports type %r is invalid.'  % type(ports)
-  assert len(ports) > 0
-  assert isinstance(cortix_start_time,float), '-> time type %r is invalid.' % \
-         type(cortix_start_time)
-  assert isinstance(cortix_final_time, float), '-> time type %r is invalid.' % \
-         type(cortix_final_time)
-  assert isinstance(cortix_time_unit, str), '-> time type %r is invalid.' % \
-         type(cortix_time_unit)
+        # Sanity test
+        assert isinstance(slot_id, int), '-> slot_id type %r is invalid.' % type(slot_id)
+        assert isinstance(ports, list), '-> ports type %r is invalid.'  % type(ports)
+        assert len(ports) > 0
+        assert isinstance(cortix_start_time,float), '-> time type %r is invalid.' % \
+                type(cortix_start_time)
+        assert isinstance(cortix_final_time, float), '-> time type %r is invalid.' % \
+                type(cortix_final_time)
+        assert isinstance(cortix_time_step, float), '-> time step type %r is invalid.' % \
+                type(cortix_time_step)
+        assert isinstance(cortix_time_unit, str), '-> time type %r is invalid.' % \
+                type(cortix_time_unit)
 
-  # Logging
-  self.__log = logging.getLogger('launcher-dados_'+str(slot_id)+'.cortix_driver.dados')
-  self.__log.info('initializing an object of Dados()')
+        # Logging
+        self.__log = logging.getLogger('launcher-dados_'+str(slot_id)+'.cortix_driver.dados')
+        self.__log.info('initializing an object of Dados()')
 
-#.................................................................................
-# Member data 
+        # Read the manisfest
+        self.__read_manifesto( manifesto_full_path_file_name )
+        self.__log.info(self.__port_diagram)
 
-  self.__slot_id = slot_id
-  self.__ports  = ports
+        # Member data 
+        self.__slot_id = slot_id
+        self.__ports  = ports
 
-  if work_dir[-1] != '/': work_dir = work_dir + '/'
-  self.__wrkDir = work_dir
+        if work_dir[-1] != '/': work_dir = work_dir + '/'
+        self.__wrkDir = work_dir
 
-  # Signal to start operation
-  self.__goSignal = True    # start operation immediately
-  for port in self.__ports: # if there is a signal port, start operation accordingly
-      (portName,portType,thisPortFile) = port
-      if portName == 'go-signal' and portType == 'use': self.__goSignal = False
+        # Signal to start operation
+        self.__goSignal = True    # start operation immediately
+        for port in self.__ports: # if there is a signal port, start operation accordingly
+            (portName,portType,thisPortFile) = port
+            if portName == 'go-signal' and portType == 'use': self.__goSignal = False
 
-  self.__setup_time = 1.0  # min; a delay time before starting to run
+        self.__setup_time = 1.0  # min; a delay time before starting to run
 
-#.................................................................................
-# Input ports
-# Read input information if any
+        # Input ports
+        # Read input information if any
 
-  #fin = open(input_full_path_file_name,'r')
+        #fin = open(input_full_path_file_name,'r')
 
-#---------------------- end def __init__():---------------------------------------
+        # if a serial port is wanted create this variable
+        # add conditional to create this or not
+        #self.__serial_232_port = RS_232()
 
- def call_ports( self, cortix_time=0.0 ):
-  '''
-  Developer must implement this method.
-  Transfer data at cortix_time
-  '''
+        return
 
-  # provide data using the 'provide-port-name' of the module
-  #self.__provide_data( provide_port_name='provide-port-name', at_time=cortix_time )
+#*********************************************************************************
+# Public member functions
+#*********************************************************************************
 
-  # use data using the 'use-port-name' of the module
-  #self.__use_data( use_port_name='use-port-name', at_time=cortix_time )
+    def call_ports( self, cortix_time=0.0 ):
+        '''
+        Developer must implement this method.
+        Transfer data at cortix_time
+        '''
 
-  return
-#---------------------- end def call_ports():---------------------------------------
+        # provide data using the 'provide-port-name' of the module
+        #self.__provide_data( provide_port_name='provide-port-name', at_time=cortix_time )
 
- def execute( self, cortix_time=0.0, cortix_time_step=0.0 ):
-  '''
-  Developer must implement this method.
-  Evolve system from cortix_time to cortix_time + cortix_time_step
-  '''
+        # use data using the 'use-port-name' of the module
+        #self.__use_data( use_port_name='use-port-name', at_time=cortix_time )
 
-  s = 'execute('+str(round(cortix_time,2))+'[min]): '
-  self.__log.debug(s)
+        return
 
-  # Developer implements helper method, for example
-  #self.__evolve( self, cortix_time, cortix_time_step ):
+    def execute( self, cortix_time=0.0, cortix_time_step=0.0 ):
+        '''
+        Developer must implement this method.
+        Evolve system from cortix_time to cortix_time + cortix_time_step
+        '''
 
-  return
-#---------------------- end def execute():----------------------------------------
+        s = 'execute('+str(round(cortix_time,2))+'[min]): '
+        self.__log.debug(s)
+
+        ir_7040 = RS_232.create_instance()
+
+        return
 
 #*********************************************************************************
 # Private helper functions (internal use: __)
+#*********************************************************************************
 
- def __provide_data( self, provide_port_name=None, at_time=0.0 ):
+    def __provide_data( self, provide_port_name=None, at_time=0.0 ):
 
-# Access the port file
-  port_file = self.__get_port_file( provide_port_name = provide_port_name )
+        # Access the port file
+        port_file = self.__get_port_file( provide_port_name = provide_port_name )
 
-# Provide data to port files
-  #if provide_port_name == 'provide-port-name' and port_file is not None: 
-  #   self.__provide_mymodule_method( port_file, at_time )
+        # Provide data to port files
+        #if provide_port_name == 'provide-port-name' and port_file is not None: 
+        #   self.__provide_mymodule_method( port_file, at_time )
 
-  return
-#---------------------- end def __provide_data():---------------------------------
+        return
 
- def __use_data( self, use_port_name=None, at_time=0.0 ):
+    def __use_data( self, use_port_name=None, at_time=0.0 ):
 
-# Access the port file
-  port_file = self.__get_port_file( use_port_name = use_port_name )
- 
-# Use data from port file
-  #if use_port_name == 'use-port-name' and port_file is not None:  
-  #   self.__use_mymodule_method( port_file, at_time )
+        # Access the port file
+        port_file = self.__get_port_file( use_port_name = use_port_name )
 
-  return
-#---------------------- end def __use_data():-------------------------------------
+        # Use data from port file
+        #if use_port_name == 'use-port-name' and port_file is not None:  
+        #   self.__use_mymodule_method( port_file, at_time )
 
- def __get_port_file( self, use_port_name=None, provide_port_name=None ):
-   """
-   This may return a None port_file
-   """
+        return
 
-   port_file = None
+    def __get_port_file( self, use_port_name=None, provide_port_name=None ):
+        '''
+        This may return a None port_file
+        '''
 
-   #..........
-   # Use ports
-   #..........
-   if use_port_name is not None:
- 
-     assert provide_port_name is None
- 
-     for port in self.__ports:
-       (portName,portType,thisPortFile) = port
-       if portName == use_port_name and portType == 'use': port_file = thisPortFile
+        port_file = None
 
-     if port_file is None: return None
- 
-     max_n_trials = 50
-     n_trials     = 0
-     while os.path.isfile(port_file) is False and n_trials <= max_n_trials:
-       n_trials += 1
-       time.sleep(0.1)
- 
-     if n_trials > max_n_trials:
-         s = '__get_port_file(): waited ' + str(n_trials) + ' trials for port: ' +\
-             port_file
-         self.__log.warn(s)
- 
-     assert os.path.isfile(port_file) is True, \
-            'port_file %r not available; stop.' % port_file
+        #..........
+        # Use ports
+        #..........
+        if use_port_name is not None:
 
-   #..............
-   # Provide ports
-   #..............
-   if provide_port_name is not None:
- 
-     assert use_port_name is None
+            assert provide_port_name is None
 
-     for port in self.__ports:
-       (portName,portType,thisPortFile) = port
-       if portName == provide_port_name and portType == 'provide': port_file = thisPortFile
- 
-   return port_file
-#---------------------- end def __get_port_file():--------------------------------
+            for port in self.__ports:
+               (portName,portType,thisPortFile) = port
+               if portName == use_port_name and portType == 'use': 
+                   port_file = thisPortFile
+
+            if port_file is None: return None
+
+            max_n_trials = 50
+            n_trials     = 0
+            while os.path.isfile(port_file) is False and n_trials <= max_n_trials:
+                n_trials += 1
+                time.sleep(0.1)
+
+            if n_trials > max_n_trials:
+                s = '__get_port_file(): waited ' + str(n_trials) + ' trials for port: '\
+                        + port_file
+                self.__log.warn(s)
+
+            assert os.path.isfile(port_file) is True, \
+                    'port_file %r not available; stop.' % port_file
+
+        #..............
+        # Provide ports
+        #..............
+        if provide_port_name is not None:
+
+            assert use_port_name is None
+
+            for port in self.__ports:
+                (portName,portType,thisPortFile) = port
+            if portName == provide_port_name and portType == 'provide':
+                port_file = thisPortFile
+
+        return port_file
+
+    def __read_manifesto( self, xml_tree_file ):
+        '''
+        Parse the manifesto
+        '''
+
+        assert isinstance(xml_tree_file, str)
+
+        # Read the manifesto
+        xml_tree = XMLTree( xml_tree_file=xml_tree_file )
+
+        assert xml_tree.get_node_tag() == 'module_manifesto'
+
+        assert xml_tree.get_node_attribute('name') == 'dados'
+
+        # List of (port_name, port_type, port_mode, port_multiplicity)
+        __ports = list()
+
+        self.__port_diagram = 'null-module-port-diagram'
+
+        # Get manifesto data  
+        for child in xml_tree.get_node_children():
+            (elem, tag, attributes, text) = child
+
+            if tag == 'port':
+
+                text = text.strip()
+
+                assert len(attributes) == 3, "only <= 3 attributes allowed."
+
+                tmp = dict()  # store port name and three attributes
+
+                for attribute in attributes:
+                    key = attribute[0].strip()
+                    val = attribute[1].strip()
+
+                    if key == 'type':
+                        assert val == 'use' or val == 'provide' or val == 'input' or \
+                            val == 'output', 'port attribute value invalid.'
+                        tmp['port_name'] = text  # port_name
+                        tmp['port_type'] = val   # port_type
+                    elif key == 'mode':
+                        file_value = val.split('.')[0]
+                        assert file_value == 'file' or file_value == 'directory',\
+                            'port attribute value invalid.'
+                        tmp['port_mode'] = val
+                    elif key == 'multiplicity':
+                        tmp['port_multiplicity'] = int(val)  # port_multiplicity
+                    else:
+                        assert False, 'invalid port attribute: %r=%r. fatal.'%\
+                                (key,val)
+
+                assert len(tmp) == 4
+                store = (tmp['port_name'], tmp['port_type'], tmp['port_mode'],
+                         tmp['port_multiplicity'])
+
+                # (port_name, port_type, port_mode, port_multiplicity)
+                __ports.append(store)
+
+                # clear
+                tmp   = None
+                store = None
+
+            if tag == 'diagram':
+
+                self.__port_diagram = text
+
+            if tag == 'ascii_art':
+
+                self.__ascii_art = text
+
+        return
 
 #======================= end class Dados: ========================================
