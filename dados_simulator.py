@@ -5,6 +5,7 @@ def create_instance():
 
 def simulator():
     import time
+    import datetime
     lines ='''P1, 1289Od, 1.23e-2, 2.07e-2, 2.87e-2, 6.35e-2, 0.00e+0, 0.00e+0, 67}, 2019-03-19 11:55:00
 P1, 1289Od, 1.42e-2, 2.77e-2, 2.79e-2, 1.00e-13, 0.00e+0, 0.00e+0, 57}, 2019-03-19 11:55:01
 P1, 1289Od, 1.41e-2, 1.38e-2, 2.83e-2, 4.23e-2, 0.00e+0, 0.00e+0, 6D}, 2019-03-19 11:55:03
@@ -40,10 +41,13 @@ P1, 1289Od, 1.12e-2, 6.91e-3, 2.17e-2, 2.11e-2, 0.00e+0, 0.00e+0, 64}, 2019-03-1
 '''
     for line in lines.split('\n'):
         try:
-            float(line.split(', ')[2])
+            spline=line.split(', ')
+            ch1=float(spline[2])
+            ch2=float(spline[4])
         except:
             continue
-        print(line)
+        timestamp = str(datetime.datetime.now())
+        print(f'channel#1= {ch1}, channel#2= {ch2}, timestamp={timestamp}')
         time.sleep(1)
 if __name__=='__main__':
 	simulator()
