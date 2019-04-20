@@ -8,7 +8,7 @@
 # Licensed under the GNU General Public License v. 3, please see LICENSE file.
 # https://www.gnu.org/licenses/gpl-3.0.txt
 '''
-RS-232 serials port communication class
+IR 7040 "intelligent ratemeter from Mirion Tech. Inc.
 '''
 #*********************************************************************************
 import os, sys, io, time, datetime, traceback
@@ -19,23 +19,19 @@ import serial
 
 class RS_232():
     r'''
-    RS-232 class for Dados
+    RS-232 class for Dados. Serial communication with various devices.
     '''
 
 #*********************************************************************************
 # Construction 
 #*********************************************************************************
 
-    def __init__( self ):
+    def __init__( self, device_name = 'null_device_name' ):
 
-        port = '/dev/ttyUSB0'
-        baud_rate = 9600
-        timeout = 5
-
-        serial_rs232 = serial.Serial( port=port, baudrate=baud_rate, \
-                timeout=timeout, stopbits=serial.STOPBITS_ONE, \
-                parity=serial.PARITY_NONE, \
-                bytesize=serial.EIGHTBITS )
+        if device_name == 'ir-7040':
+            self.__ir_7040()
+        else:
+            assert device_name == 'ir-7040','device name: %r'%device_name
 
         return
 
@@ -57,27 +53,24 @@ class RS_232():
 
         return
 
-    def create_instance(self,*args,**kwargs):
-        #Creates a new thread, then kills main thread
-        worker = threading.Thread(target=self.__start_com, name='start_com')
-        worker.start()
-        return
 #*********************************************************************************
 # Private helper functions (internal use: __)
 #*********************************************************************************
-    def __start_com(self):
-        self.socket_list = []
-        self.init_port=60000
-        self.port=60001
-        self.host=socket.gethostbyname(socket.gethostname())
-        print('Host IP-address: {}'.format(self.host()))
+
+    def __ir_7040( self ):
+        '''
+        IR 7040 "intelligent ratemeter from Mirion Tech. Inc.
+        '''
+
         #initialize serial object, parameters hard-coded for now
-        ser=serial.Serial(port='/dev/ttyUSB0',baudrate=9600,timeout=5,
-                          stopbits = serial.STOPBITS_ONE,
-                          parity = serial.PARITY_NONE,
-                          bytesize=serial.EIGHTBITS)
-        socket_worker=threading.Thread(target=self.__initialize_socket,name='init_worker')
-        socket_worker.start()
+        port = '/dev/ttyUSB0'
+        baud_rate = 9600
+        timeout = 5
+
+        ser = serial.Serial(port='/dev/ttyUSB0',baudrate=9600,timeout=5,
+                            stopbits = serial.STOPBITS_ONE,
+                            parity = serial.PARITY_NONE,
+                            bytesize=serial.EIGHTBITS)
         print('COMM START')
         olddata=''
         while True:
@@ -104,49 +97,8 @@ class RS_232():
             commaline=padding
             padding += (" " * (100 - len(padding)))
             c=0
-            for conn in self.socket_list:
-                try:
-                    conn.send(padding.encode())
-                except Exception as e:
-                    print(traceback.print_exc())
-                    conn.close()
-                    del self.socket_list[c]
-                c+=1
 
-            if 'init_woker' not in [f.name for f in threading.enumerate()]:
-                socket_worker=threading.Thread(target=self.__initialize_socket,name='init_worker')
-                socket_worker.start()
             with open(filename,'a') as f:
                 f.write('{}\n'.format(commaline))
-        self.conn.close()
 
-    def __initialize_socket(self):
-        try:
-            print('initial socket')
-            #Initial Socket for establishing permanent Port number
-            sock=socket.socket()
-            sock.settimeout(60)
-            sock.bind((self.host,self.init_port))
-            sock.listen(5)
-            conn,addr=sock.accept()
-            self.port+=1
-            string='port, {}, host, {}'.format(self.port,self.host)
-            string+=' '*(40-len(string))
-            conn.send(string.encode())
-            time.sleep(0.5)
-            print('Socket Initialized!')
-            conn.close()
-            #Reestablishes connection with new port
-            s = socket.socket()
-            s.settimeout(60)
-            print(self.port)
-            s.bind((self.host, self.port))
-            s.listen(5)
-            conn, addr = s.accept()
-            #new socket connections appended to list
-            self.socket_list.append(conn)
-            print('Connected to:{},{}'.format(conn,addr))
-        except Exception as e:
-            return        
-        return
 #======================= end class Dados: ========================================
