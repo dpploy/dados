@@ -113,7 +113,7 @@ class Dados():
         s = 'execute('+str(round(cortix_time,2))+'[min]): '
         self.__log.debug(s)
 
-        ir_7040 = RS_232.create_instance()
+        #ir_7040 = RS_232.create_instance()
 
         return
 
