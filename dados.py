@@ -17,8 +17,6 @@ import logging
 from cortix.src.utils.xmltree import XMLTree
 from .rs_232 import RS_232
 
-from .dados_simulator import simulator
-
 #*********************************************************************************
 
 class Dados():
