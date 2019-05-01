@@ -54,8 +54,9 @@
 
   <task name='solo-dados' >
    <start_time unit='minute'>0.0</start_time>
-   <evolve_time unit='minute'>2.5</evolve_time>
+   <evolve_time unit='minute'>1.0</evolve_time>
    <time_step unit='second'>0.5</time_step>
+   <real_time>false</real_time>
    <logger level='DEBUG'>
     <file_handler level='DEBUG'> </file_handler>
     <console_handler level='INFO'> </console_handler>
@@ -81,7 +82,7 @@
         the parent directory is: 
             full_path_to_parent_directory
    -->
-        fullpath_to_my_lib
+        /home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing
     </home_dir>
    </module_library>
 
@@ -104,7 +105,7 @@
    <module name='dados' type='native'>
 
     <input_file_name>dados.input</input_file_name>
-    <input_file_path>../input</input_file_path>
+    <input_file_path>/home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing/cortix-dev/input</input_file_path>
 
     <logger level='DEBUG'>
      <file_handler level='DEBUG'> </file_handler>
@@ -135,7 +136,7 @@
     <!-- Modules need to be given a slot number; use a colon after the name followed by an integer-->
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
     <!-- For self-connection of a module: fromPort is output type; toPort is provide type-->
-    <connect fromModuleSlot='dados:0' fromPort='rs-232' toModuleSlot='dados:0' toPort='self-input'/>
+    <connect fromModuleSlot='dados:0' fromPort='rs-232' toModuleSlot='dados:0' toPort='ir-7040'/>
    </network>
 
    <!--                  Network objects end here                                   -->
