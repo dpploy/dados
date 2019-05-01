@@ -165,7 +165,7 @@ class Dados():
 
             for port in self.__ports:
                (portName,portType,thisPortFile) = port
-               if portName == use_port_name and portType == 'use': 
+               if portName == use_port_name and portType == 'use':
                    port_file = thisPortFile
 
             if port_file is None: return None

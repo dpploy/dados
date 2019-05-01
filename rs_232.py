@@ -29,7 +29,8 @@ class RS_232():
     def __init__( self, device_name = 'null_device_name' ):
 
         if device_name == 'ir-7040':
-            self.__ir_7040()
+            pass
+            #self.__ir_7040()
         else:
             assert device_name == 'ir-7040','device name: %r'%device_name
 
