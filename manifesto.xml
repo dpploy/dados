@@ -27,6 +27,7 @@
 
     <!-- provide ports -->
     <port type='input'   mode='hardware' multiplicity='1'>ir-7040</port>
+    <port type='input'   mode='hardware' multiplicity='1'>analog-input</port>
     <port type='provide' mode='file.xml' multiplicity='1'>state</port>
 
     <port_doc port_name='mcc-118'>
@@ -47,7 +48,7 @@
    .|analog-input|--> | mcc-118   |           |                     .
    .--------------    |...........|...........|                     .
    .                  |           | state     |      output port    .
-   .                  |...........|...........|     _____________   .
+   . provide-like     |...........|...........|     _____________   .
    .                  |           | output    | --- |self-output|   .
    .                  =========================     -------------   .
    .                                                   use-like     .
