@@ -26,11 +26,12 @@ class RS_232():
 # Construction 
 #*********************************************************************************
 
-    def __init__( self, device_name = 'null_device_name' ):
+    def __init__( self, device_name = 'null_device_name', wrk_dir='null-rs_232_wrk_dir' ):
+
+        self.__wrk_dir = wrk_dir
 
         if device_name == 'ir-7040':
-            pass
-            #self.__ir_7040()
+            self.__ir_7040()
         else:
             assert device_name == 'ir-7040','device name: %r'%device_name
 
@@ -72,7 +73,6 @@ class RS_232():
                             stopbits = serial.STOPBITS_ONE,
                             parity = serial.PARITY_NONE,
                             bytesize=serial.EIGHTBITS)
-        print('COMM START')
         olddata=''
         while True:
             #Send request string, specific to IR7040
@@ -86,14 +86,12 @@ class RS_232():
             olddata=line
             splitline=line.split()
             splitline.append(self.timestamp)
-            print(line)
-            print(splitline)
             for n in range(2,8):
                 splitline[n] = splitline[n][0]+'.'+splitline[n][1:3]+'e'+splitline[n][3:]
-            filename='data/Stack_monitor_data_{}.csv'.format(str(datetime.datetime.now())[:10])
+            filename='{}/ir_7040_data_{}.csv'.format(self.__wrk_dir,str(datetime.datetime.now())[:10])
             if not os.path.isfile(filename):
                 with open(filename,'a') as f:
-                    f.write('Type, Callback, Ch1_rate_filtered, Ch1_rate_unfiltered, Ch2_rate_filtered, Ch2_rate_unfiltered, Ch4_rate_filtered, Ch4_rate_unfiltered, Checksum, Date and Time\n')
+                    f.write('Type,Callback,Ch1_rate_filtered,Ch1_rate_unfiltered,Ch2_rate_filtered,Ch2_rate_unfiltered,Ch4_rate_filtered,Ch4_rate_unfiltered,Checksum,Date and Time\n')
             padding = ', '.join(splitline)
             commaline=padding
             padding += (" " * (100 - len(padding)))
