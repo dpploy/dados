@@ -13,9 +13,11 @@ Dados module in Cortix
 #*********************************************************************************
 import os, sys, io, time
 import logging
+import threading
 
 from cortix.src.utils.xmltree import XMLTree
 from .rs_232 import RS_232
+from .mcc_118 import MCC118
 
 #*********************************************************************************
 
@@ -63,17 +65,30 @@ class Dados():
 
         # Member data 
         self.__slot_id = slot_id
-        self.__ports  = ports
+        self.__ports   = ports
 
         if work_dir[-1] != '/': work_dir = work_dir + '/'
-        self.__wrkDir = work_dir
+        self.__wrk_dir = work_dir
 
         # Start external devices 
         for port in self.__ports: # if there is a connected device, start its port
-            (portName,portType,thisPortHardware) = port
-            if portName == 'rs-232' and portType == 'use':
-                device_name = thisPortHardware.split('/')[-1]
-                self.__rs_232 = RS_232( device_name = device_name )
+            ( port_name, port_type, this_port_hardware ) = port
+
+            if port_name == 'rs-232' and port_type == 'use':
+
+                device_name = this_port_hardware.split('/')[-1]
+
+                worker = threading.Thread( target=lambda: RS_232( device_name = device_name, wrk_dir = self.__wrk_dir ))
+                worker.daemon = True
+                worker.start()
+
+            if port_name == 'mcc-118' and port_type == 'use':
+
+                device_name = this_port_hardware.split('/')[-1]
+
+                worker = threading.Thread( target=lambda: MCC118( device_name = device_name, wrk_dir = self.__wrk_dir ))
+                worker.daemon = True
+                worker.start()
 
         self.__setup_time = 1.0  # min; a delay time before starting to run
 
@@ -162,8 +177,8 @@ class Dados():
             assert provide_port_name is None
 
             for port in self.__ports:
-               (portName,portType,thisPortFile) = port
-               if portName == use_port_name and portType == 'use':
+               (port_name,port_type,thisPortFile) = port
+               if port_name == use_port_name and port_type == 'use':
                    port_file = thisPortFile
 
             if port_file is None: return None
@@ -190,8 +205,8 @@ class Dados():
             assert use_port_name is None
 
             for port in self.__ports:
-                (portName,portType,thisPortFile) = port
-            if portName == provide_port_name and portType == 'provide':
+                (port_name,port_type,thisPortFile) = port
+            if port_name == provide_port_name and port_type == 'provide':
                 port_file = thisPortFile
 
         return port_file
