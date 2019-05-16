@@ -13,12 +13,12 @@ Dados module in Cortix
 #*********************************************************************************
 import os, sys, io, time
 import logging
-import threading
 
-from cortix.src.utils.xmltree import XMLTree
 from .rs_232 import RS_232
 from .mcc_118 import MCC118
 
+from multiprocessing import Process
+from cortix.src.utils.xmltree import XMLTree
 #*********************************************************************************
 
 class Dados():
@@ -39,7 +39,7 @@ class Dados():
                   cortix_start_time = 0.0,
                   cortix_final_time = 0.0,
                   cortix_time_step = 0.0,
-                  cortix_time_unit = None 
+                  cortix_time_unit = None
                 ):
 
         # Sanity test
@@ -70,26 +70,19 @@ class Dados():
         if work_dir[-1] != '/': work_dir = work_dir + '/'
         self.__wrk_dir = work_dir
 
+
         # Start external devices 
         for port in self.__ports: # if there is a connected device, start its port
             ( port_name, port_type, this_port_hardware ) = port
 
-            if port_name == 'rs-232' and port_type == 'use':
-
+            if port_type == 'use':
                 device_name = this_port_hardware.split('/')[-1]
-
-                worker = threading.Thread( target=lambda: RS_232( device_name = device_name, wrk_dir = self.__wrk_dir ))
-                worker.daemon = True
-                worker.start()
-
-            if port_name == 'mcc-118' and port_type == 'use':
-
-                device_name = this_port_hardware.split('/')[-1]
-
-                worker = threading.Thread( target=lambda: MCC118( device_name = device_name, wrk_dir = self.__wrk_dir ))
-                worker.daemon = True
-                worker.start()
-
+                args = (device_name, self.__wrk_dir)
+                if port_name == 'rs-232':
+                    p = Process(target=RS_232, args=args)
+                elif port_name == 'mcc-118':
+                    p = Process(target=MCC118, args=args)
+                p.start()
         self.__setup_time = 1.0  # min; a delay time before starting to run
 
         # Input ports

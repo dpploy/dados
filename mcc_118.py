@@ -60,7 +60,6 @@ class MCC118():
         chan=0
         while True:
             value = hat.a_in_read(0,options)
-            print(value)
             fout.write(str(value)+'\n')
             time.sleep(0.1)
 

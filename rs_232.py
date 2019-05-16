@@ -85,7 +85,6 @@ class RS_232():
                 continue
             self.timestamp=str(datetime.datetime.now())[:-7]
             olddata=line
-            print(line)
             splitline=line.split()
             splitline.append(self.timestamp)
             for n in range(2,8):
@@ -112,3 +111,4 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     RS_232( device_name = args.device_name, wrk_dir = args.work_dir )
+    print("HELLO WORLD!")
