@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # This file is part of the Cortix toolkit evironment
 # https://github.com/dpploy/cortix
@@ -12,7 +13,7 @@ IR 7040 "intelligent ratemeter from Mirion Tech. Inc.
 '''
 #*********************************************************************************
 import os, sys, io, time, datetime, traceback
-import logging
+import argparse, logging
 
 import serial
 #*********************************************************************************
@@ -84,6 +85,7 @@ class RS_232():
                 continue
             self.timestamp=str(datetime.datetime.now())[:-7]
             olddata=line
+            print(line)
             splitline=line.split()
             splitline.append(self.timestamp)
             for n in range(2,8):
@@ -101,3 +103,12 @@ class RS_232():
                 f.write('{}\n'.format(commaline))
 
 #======================= end class Dados: ========================================
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Spawn an RS_232 process')
+    parser.add_argument('-d', '--device-name', dest="device_name", help='The name of the device', required=True)
+    parser.add_argument('-w', '--work-dir', dest="work_dir", help='The path to the work directory', required=True)
+
+    args = parser.parse_args()
+
+    RS_232( device_name = args.device_name, wrk_dir = args.work_dir )

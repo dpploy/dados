@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # This file is part of the Cortix toolkit evironment
 # https://github.com/dpploy/cortix
@@ -12,7 +13,7 @@ MCC 118 DAQ GitHub repository.
 '''
 #*********************************************************************************
 import os, sys, io, time, datetime, traceback
-import logging
+import argparse, logging
 
 from daqhats import mcc118, OptionFlags, HatIDs, HatError, hat_list
 #*********************************************************************************
@@ -26,7 +27,7 @@ class MCC118():
 # Construction 
 #*********************************************************************************
 
-    def __init__( self, device_name = 'null_device_name', 
+    def __init__( self, device_name = 'null_device_name',
             wrk_dir='null-mcc_118_wrk_dir' ):
 
         self.__wrk_dir = wrk_dir
@@ -59,7 +60,17 @@ class MCC118():
         chan=0
         while True:
             value = hat.a_in_read(0,options)
+            print(value)
             fout.write(str(value)+'\n')
             time.sleep(0.1)
-         
+
 #======================= end class MCC118: =======================================
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Spawn an MCC118 process')
+    parser.add_argument('-d', '--device-name', dest="device_name", help='The name of the device', required=True)
+    parser.add_argument('-w', '--work-dir', dest="work_dir", help='The path to the work directory', required=True)
+
+    args = parser.parse_args()
+
+    MCC118( device_name = args.device_name, wrk_dir = args.work_dir )
