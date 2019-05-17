@@ -17,7 +17,7 @@ import logging
 from daqhats import mcc118, OptionFlags, HatIDs, HatError, hat_list
 #*********************************************************************************
 
-class MCC118():
+class MCC_118():
     r'''
     RS-232 class for Dados. Serial communication with various devices.
     '''
