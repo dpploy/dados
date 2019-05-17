@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # This file is part of the Cortix toolkit environment
 # https://cortix.org
@@ -19,11 +19,12 @@ As Cortix evolves additional complexity may be added to this driver and/or other
 driver examples can be created.
 '''
 #*********************************************************************************
-import os, sys
+import os, sys, multiprocessing, time
 from cortix import Cortix
 
 sys.path.append("../..")
-import rs_232
+from rs_232 import RS_232
+from mcc_118 import MCC_118
 #*********************************************************************************
 
 def main():
@@ -31,6 +32,22 @@ def main():
     pwd = os.path.dirname(__file__)
     full_path_config_file = os.path.join(pwd, '../input/cortix-config-dados.xml')
     print('main')
+    worker1 = multiprocessing.Process(target=RS_232, args=('ir-7040','/tmp/dados'))
+    worker1.start()
+    worker2 = multiprocessing.Process(target=MCC_118, args=('analog-input','/tmp/dados'))
+    worker2.start()
+
+    oldline='' 
+    print('')
+    while True:
+        with open('/tmp/dados/ir_tmp.csv') as file:
+            line = str(file.readline())
+        #print(line)
+        time.sleep(1)
+        if oldline == line:
+            continue
+        oldline=line
+        print(line,end='')
  # NB: if another instantiation of Cortix occurs, the cortix wrk directory specified
  #     in the cortix configuration file must be different, else the logging facility 
  #     will have log file collision.
