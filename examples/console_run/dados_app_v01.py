@@ -40,8 +40,8 @@ def main():
     oldline='' 
     print('')
     while True:
-        with open('/tmp/dados/ir_tmp.csv') as file:
-            line = str(file.readline())
+        with open('/tmp/dados/ir_temp.csv') as file:
+            line = file.readline()
         #print(line)
         time.sleep(1)
         if oldline == line:

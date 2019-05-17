@@ -26,8 +26,9 @@ class RS_232():
 # Construction 
 #*********************************************************************************
 
-    def __init__( self, device_name = 'null_device_name', wrk_dir='null-rs_232_wrk_dir' ):
-
+    def __init__( self, device_name = 'null_device_name', wrk_dir='/tmp/dados' ):
+        if not os.path.isdir(wrk_dir):
+            os.makedirs(wrk_dir)
         self.__wrk_dir = wrk_dir
 
         if device_name == 'ir-7040':
@@ -77,6 +78,7 @@ class RS_232():
                             parity = serial.PARITY_NONE,
                             bytesize=serial.EIGHTBITS)
         olddata=''
+        tempfile='{}/ir_temp.csv'.format(self.__wrk_dir)
         while True:
             #Send request string, specific to IR7040
             ser.write('\r\nP0001 1289Od 7F}'.encode('ascii'))
@@ -86,7 +88,7 @@ class RS_232():
                 time.sleep(.25)
                 continue
             self.timestamp=str(datetime.datetime.now())[:-7]
-            print(line)
+#            print(line)
             olddata=line
             splitline=line.split()
             splitline.append(self.timestamp)
@@ -100,7 +102,8 @@ class RS_232():
             commaline=padding
             padding += (" " * (100 - len(padding)))
             c=0
-
+            with open(tempfile,'w') as file:
+                file.write(commaline)
             with open(filename,'a') as f:
                 f.write('{}\n'.format(commaline))
 
