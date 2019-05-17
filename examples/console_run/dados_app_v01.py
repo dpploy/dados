@@ -42,12 +42,14 @@ def main():
     while True:
         with open('/tmp/dados/ir_temp.csv') as file:
             line = file.readline()
-        #print(line)
-        time.sleep(1)
+        #print(line) 
         if oldline == line:
             continue
         oldline=line
-        print(line,end='')
+        print('\r',end='')
+        print('\r',line,end='')
+        sys.stdout.flush()
+        time.sleep(.1)
  # NB: if another instantiation of Cortix occurs, the cortix wrk directory specified
  #     in the cortix configuration file must be different, else the logging facility 
  #     will have log file collision.
