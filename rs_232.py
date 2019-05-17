@@ -68,7 +68,10 @@ class RS_232():
         port = '/dev/ttyUSB0'
         baud_rate = 9600
         timeout = 5
-
+        home = os.path.expanduser('~')
+        directory=home+'/IR7040_database'
+        if not os.path.exists(directory):
+             os.makedirs(directory)
         ser = serial.Serial(port='/dev/ttyUSB0',baudrate=9600,timeout=5,
                             stopbits = serial.STOPBITS_ONE,
                             parity = serial.PARITY_NONE,
@@ -83,12 +86,13 @@ class RS_232():
                 time.sleep(.25)
                 continue
             self.timestamp=str(datetime.datetime.now())[:-7]
+            print(line)
             olddata=line
             splitline=line.split()
             splitline.append(self.timestamp)
             for n in range(2,8):
                 splitline[n] = splitline[n][0]+'.'+splitline[n][1:3]+'e'+splitline[n][3:]
-            filename='{}/ir_7040_data_{}.csv'.format(self.__wrk_dir,str(datetime.datetime.now())[:10])
+            filename='{}/ir_7040_data_{}.csv'.format(directory,str(datetime.datetime.now())[:10])
             if not os.path.isfile(filename):
                 with open(filename,'a') as f:
                     f.write('Type,Callback,Ch1_rate_filtered,Ch1_rate_unfiltered,Ch2_rate_filtered,Ch2_rate_unfiltered,Ch4_rate_filtered,Ch4_rate_unfiltered,Checksum,Date and Time\n')
