@@ -27,7 +27,7 @@ class MCC_118():
 #*********************************************************************************
 
     def __init__( self, device_name = 'null_device_name', 
-            wrk_dir='null-mcc_118_wrk_dir' ):
+            wrk_dir='/tmp/dados' ):
 
         self.__wrk_dir = wrk_dir
 
@@ -46,20 +46,26 @@ class MCC_118():
         '''
         IR 7040 "intelligent ratemeter from Mirion Tech. Inc.
         '''
-
         filename = self.__wrk_dir+'/mcc_118_data.csv'
-        fout = open(filename,'w')
-        fout.write('This is the header\n')
-
+        with open(filename,'w') as f:
+            f.write('')
         hatlist = hat_list()
         for i in hatlist:
             ad = i.address
         hat = mcc118(ad)
         options = OptionFlags.DEFAULT
         chan=0
+        avg=[]
         while True:
             value = hat.a_in_read(0,options)
-            fout.write(str(value)+'\n')
-            time.sleep(0.1)
-         
+            avg.append(value)
+            if len(avg)<100:
+                time.sleep(0.005)
+                continue
+            mean=sum(avg)/len(avg)
+            avg=[]
+            #print(mean)
+            with open(filename,'w') as f:
+                f.write(str(mean))
+
 #======================= end class MCC118: =======================================
