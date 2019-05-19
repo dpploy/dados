@@ -67,7 +67,6 @@ def read_display(filelist):
                         vallist.append(v1)
                     except ValueError:
                         continue
-        vallist.append(' select a command: ')
         string='\r'+', '.join(vallist)
         #string = '\rCh1: {}, ch2: {}, Ch1(Volt): {}'.format(ch1,ch2,v1)
         if string==oldstring:
@@ -87,22 +86,34 @@ def main():
     length=42
     pwd = os.path.dirname(__file__)
     full_path_config_file = os.path.join(pwd, '../input/cortix-config-dados.xml')
-    print('main')
+    print(r'''
+    ____________________________________
+    . ____    ___  ____     ___    __  .
+    . || \\  // \\ || \\   // \\  (( \ .
+    . ||  )) ||=|| ||  )) ((   ))  \\  .
+    . ||_//  || || ||_//   \\_//  \_)) .
+    ____________________________________
+
+
+    ''')
     timestamp=str(datetime.datetime.now())
     timeID=timestamp[:4]+timestamp[5:7]+timestamp[8:10]+timestamp[11:13]+timestamp[14:16]+timestamp[17:19]
     oldline=''
     print('')
-    print('''1) RS_232
-2) MCC_118
+    print('''Commands:
+1) Start RS_232
+2) Start MCC_118
 3) Start Display
-Press anything else to save Datapoint
+
+Type anything else to save Datapoint, command, and timestamp
+
 ''')
     filelist=[]
     while True:
-        length = len(string)
-        word=input('\r{}'.format(' '*length))
+        length = 50
+        word=input('\r{}|Enter Command: '.format(' '*length))
         namelist=[f.getName() for f in threading.enumerate()]
-        timestamp=datetime.datetime.now()
+        timestamp=str(datetime.datetime.now())
         if word=='1' and 'rs232' not in namelist:
             start_rs232()
             if '/tmp/dados/ir_temp.csv' not in filelist:
