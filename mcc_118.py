@@ -56,6 +56,10 @@ class MCC_118():
         options = OptionFlags.DEFAULT
         chan=0
         avg=[]
+        home=os.path.expanduser('~')
+        directory=home+'/IR7040_database'
+        if not os.path.isdir(directory):
+            os.makedirs(directory)
         while True:
             value = hat.a_in_read(0,options)
             avg.append(value)
@@ -65,7 +69,11 @@ class MCC_118():
             mean=sum(avg)/len(avg)
             avg=[]
             #print(mean)
+            timestamp=str(datetime.datetime.now())[:-7]
+            filename2='{}/mcc_118_data_{}'.format(directory,str(datetime.datetime.now())[:10])
             with open(filename,'w') as f:
                 f.write(str(mean))
+            with open(filename2,'a') as file:
+                file.write('{}, {}\n'.format(str(mean),timestamp))
 
 #======================= end class MCC118: =======================================
