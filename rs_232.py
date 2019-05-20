@@ -11,13 +11,13 @@
 IR 7040 "intelligent ratemeter from Mirion Tech. Inc.
 '''
 #*********************************************************************************
-import os, sys, io, time, datetime, traceback
+import os, sys, io, time, datetime, traceback, threading
 import logging
 
 import serial
 #*********************************************************************************
 
-class RS_232():
+class RS_232(threading.Thread):
     r'''
     RS-232 class for Dados. Serial communication with various devices.
     '''
@@ -26,7 +26,8 @@ class RS_232():
 # Construction 
 #*********************************************************************************
 
-    def __init__( self, device_name = 'null_device_name', wrk_dir='/tmp/dados' ):
+    def __init__( self, device_name = 'null_device_name', wrk_dir='/tmp/dados',rsevent=None):
+        self.rsevent=rsevent
         if not os.path.isdir(wrk_dir):
             os.makedirs(wrk_dir)
         self.__wrk_dir = wrk_dir
@@ -89,6 +90,9 @@ class RS_232():
                 continue
             self.timestamp=str(datetime.datetime.now())[:-7]
 #            print(line)
+            if self.rsevent.isSet():
+#                print('Thread killed')
+                return
             olddata=line
             splitline=line.split()
             splitline.append(self.timestamp)

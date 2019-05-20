@@ -28,13 +28,17 @@ from mcc_118 import MCC_118
 #*********************************************************************************
 
 def start_rs232():
-    rsworker=threading.Thread(target=RS_232, args=('ir-7040','/tmp/dados'),name='rs232')
+    global rsevent
+    rsevent=threading.Event()
+    rsworker=threading.Thread(target=RS_232, args=('ir-7040','/tmp/dados',rsevent),name='rs232')
     rsworker.daemon=True
     rsworker.start()
     return
 
 def start_mcc118():
-    mccworker=threading.Thread(target=MCC_118, args=('analog-input','/tmp/dados'),name='mcc118')
+    global mccevent
+    mccevent=threading.Event()
+    mccworker=threading.Thread(target=MCC_118, args=('analog-input','/tmp/dados',mccevent),name='mcc118')
     mccworker.daemon=True
     mccworker.start()
     return
@@ -76,7 +80,8 @@ def read_display(filelist):
         length = len(string)
         print(string,end='')
         sys.stdout.flush()
-
+        if devent.isSet():
+            return
         time.sleep(.1)
 
 
@@ -104,8 +109,10 @@ def main():
 1) Start RS_232
 2) Start MCC_118
 3) Start Display
+4) quit
 
 Type anything else to save Datapoint, command, and timestamp
+Enter the command again to kill the thread
 
 ''')
     filelist=[]
@@ -114,23 +121,37 @@ Type anything else to save Datapoint, command, and timestamp
         word=input('\r{}|Enter Command: '.format(' '*length))
         namelist=[f.getName() for f in threading.enumerate()]
         timestamp=str(datetime.datetime.now())
-        if word=='1' and 'rs232' not in namelist:
+        if word=='1':
+            if 'rs232' in namelist:
+                rsevent.set()
+                continue
             start_rs232()
             if '/tmp/dados/ir_temp.csv' not in filelist:
                 filelist.append('/tmp/dados/ir_temp.csv')
-        elif word=='2' and 'mcc118' not in namelist:
-            try:
-                check2==True
+        if word=='2': 
+            if 'mcc118' in namelist:
+                mccevent.set()
                 continue
-            except:
-                pass
-            check2=True
             start_mcc118()
             if '/tmp/dados/mcc_118_data.csv' not in filelist:
                 filelist.append('/tmp/dados/mcc_118_data.csv')
-        elif word=='3' and 'display' not in namelist:
+        elif word=='3':
+            global devent
+            if 'display' in namelist:
+                devent.set()
+                continue
+            devent=threading.Event()
             worker=threading.Thread(target=read_display,args=(filelist,),daemon=True,name='display')
             worker.start()
+        elif word=='4':
+            print('\nGoodbye\n')
+            try:
+                rsevent.set()
+                mccevent.set()
+                devent.set()
+            except:
+                pass
+            return
         else:
             with open('/tmp/dados/experiment_{}.csv'.format(timeID),'a') as f:
                 f.write('{}, {}, {}\n'.format(timestamp, string, word))

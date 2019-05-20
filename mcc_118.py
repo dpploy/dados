@@ -27,8 +27,8 @@ class MCC_118():
 #*********************************************************************************
 
     def __init__( self, device_name = 'null_device_name', 
-            wrk_dir='/tmp/dados' ):
-
+            wrk_dir='/tmp/dados',mccevent =None):
+        self.mccevent=mccevent
         self.__wrk_dir = wrk_dir
 
         if device_name == 'analog-input':
@@ -75,5 +75,7 @@ class MCC_118():
                 f.write(str(mean))
             with open(filename2,'a') as file:
                 file.write('{}, {}\n'.format(str(mean),timestamp))
+            if self.mccevent.isSet():
+                return
 
 #======================= end class MCC118: =======================================
