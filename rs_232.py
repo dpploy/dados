@@ -26,16 +26,16 @@ class RS_232(threading.Thread):
 # Construction 
 #*********************************************************************************
 
-    def __init__( self, device_name = 'null_device_name', wrk_dir='/tmp/dados',rsevent=None):
+    def __init__( self, wrk_dir='/tmp/dados',filename='ir_data',rsevent=None):
         self.rsevent=rsevent
+        self.filename=filename
         if not os.path.isdir(wrk_dir):
             os.makedirs(wrk_dir)
         self.__wrk_dir = wrk_dir
 
-        if device_name == 'ir-7040':
-            self.__ir_7040()
-        else:
-            assert device_name == 'ir-7040','device name: %r'%device_name
+#        if device_name == 'ir-7040':
+#        else:
+#            assert device_name == 'ir-7040','device name: %r'%device_name
 
         return
 
@@ -61,7 +61,7 @@ class RS_232(threading.Thread):
 # Private helper functions (internal use: __)
 #*********************************************************************************
 
-    def __ir_7040( self ):
+    def ir_7040(self,timeID='',event=None):
         '''
         IR 7040 "intelligent ratemeter from Mirion Tech. Inc.
         '''
@@ -79,7 +79,7 @@ class RS_232(threading.Thread):
                             parity = serial.PARITY_NONE,
                             bytesize=serial.EIGHTBITS)
         olddata=''
-        tempfile='{}/ir_temp.csv'.format(self.__wrk_dir)
+        tempfile='{}/{}{}.csv'.format(self.__wrk_dir,self.filename,timeID)
         while True:
             #Send request string, specific to IR7040
             ser.write('\r\nP0001 1289Od 7F}'.encode('ascii'))
@@ -90,9 +90,12 @@ class RS_232(threading.Thread):
                 continue
             self.timestamp=str(datetime.datetime.now())[:-7]
 #            print(line)
-            if self.rsevent.isSet():
-#                print('Thread killed')
-                return
+            try:
+                if self.rsevent.isSet():
+#                    print('Thread killed')
+                    return
+            except AttributeError:
+                pass
             olddata=line
             splitline=line.split()
             splitline.append(self.timestamp)
