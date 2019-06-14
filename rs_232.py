@@ -82,7 +82,7 @@ class RS_232(threading.Thread):
         tempfile='{}/{}{}.csv'.format(self.__wrk_dir,self.filename,timeID)
         while True:
             #Send request string, specific to IR7040
-            ser.write('\r\nP0001 1289Od 7F}'.encode('ascii'))
+            ser.write('\r\nP0001 01245689BCDMNVWYZaOdghin 55}'.encode('ascii'))
             original_line=ser.readline()
             line = str(original_line.decode('utf-8', errors='replace').strip())
             if line == olddata:
@@ -104,7 +104,12 @@ class RS_232(threading.Thread):
             filename='{}/ir_7040_data_{}.csv'.format(directory,str(datetime.datetime.now())[:10])
             if not os.path.isfile(filename):
                 with open(filename,'a') as f:
-                    f.write('Type,Callback,Ch1_rate_filtered,Ch1_rate_unfiltered,Ch2_rate_filtered,Ch2_rate_unfiltered,Ch4_rate_filtered,Ch4_rate_unfiltered,Checksum,Date and Time\n')
+                    f.write('Type, Callback, ch1_rate_filtered, ch1_rate_unfiltered, ch1_dose, ch1_alarm_high, ch1_alarm_low\
+                            , ch2_rate_filtered, ch2_rate_unfiltered, ch2_dose, ch2_alarm_high, ch2_alarm_low\
+                            , Leak Rate: Gallons/Day, Leak Rate: %Power Level\
+                            , ch3_rate_filtered, ch3_rate_unfiltered, ch3_dose, ch3_alarm_high, ch3_alarm_low\
+                            , ch4_rate_filtered, ch4_rate_unfiltered, ch4_dose, ch4_alarm_high, ch4_alarm_low\
+                            , Checksum, Probe Status, Date and Time\n')
             padding = ', '.join(splitline)
             commaline=padding
             padding += (" " * (100 - len(padding)))
