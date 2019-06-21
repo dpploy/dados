@@ -7,18 +7,19 @@ import traceback
 import time
 
 s = socket.socket()             # Create a socket object
-host = 'xx.xxx.xx.xx'              # Get local machine name
+host = '10.253.90.99'              # Get local machine name
 port = 60000                    # Reserve a port for your service.
 
 s.connect((host, port))
 data = s.recv(40).decode().split(', ')
 port=int(data[1])
-host=data[3]
+host=data[3].strip()
 s.close()
 
 print('port name = {}, host name= {}'.format(port,host))
-time.sleep(1.5)
+time.sleep(3)
 s = socket.socket()
+socket.getaddrinfo('127.0.0.1', 8080)
 s.connect((host, port))
 a1=[deque(),deque()]
 b1=[deque(),deque()]
@@ -43,19 +44,20 @@ ax.grid()
 ax2.grid()
 ax3.grid()
 while True:
-    data = s.recv(100)
+    data = s.recv(400)
     line = data.decode().strip()
     spline = line.split(', ')
     if len(spline)<10:
         continue
+    print(line)
     try:
         ch1=float(spline[2])
-        ch2=float(spline[4])
-        ch4=float(spline[6])
+        ch2=float(spline[7])
+        ch4=float(spline[14])
         timestamp=spline[-1]
         dtime = datetime.datetime.strptime(timestamp,'%Y-%m-%d %H:%M:%S')
     except:
-        plt.pause(0.1)
+
         continue
 
     a1[1].appendleft(ch1)
@@ -71,4 +73,6 @@ while True:
     plt.draw()
     plt.pause(0.1)
     del ax.lines[:10]
+    del ax2.lines[:10]
+    del ax3.lines[:10]
 
