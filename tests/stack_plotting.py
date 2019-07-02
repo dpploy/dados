@@ -19,7 +19,7 @@ s.close()
 print('port name = {}, host name= {}'.format(port,host))
 time.sleep(3)
 s = socket.socket()
-socket.getaddrinfo('127.0.0.1', 8080)
+#socket.getaddrinfo('127.0.0.1', 8080)
 s.connect((host, port))
 a1=[deque(),deque()]
 b1=[deque(),deque()]
