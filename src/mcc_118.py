@@ -19,63 +19,70 @@ from daqhats import mcc118, OptionFlags, HatIDs, HatError, hat_list
 
 class MCC_118():
     r'''
-    RS-232 class for Dados. Serial communication with various devices.
+
     '''
 
 #*********************************************************************************
 # Construction 
 #*********************************************************************************
 
-    def __init__( self, device_name = 'null_device_name', 
-            wrk_dir='/tmp/dados',mccevent =None):
-        self.mccevent=mccevent
-        self.__wrk_dir = wrk_dir
+    def __init__( self, wrk_dir='/tmp/dados',db_dir='IR_7040_db'):
+        print('start')
 
-        if device_name == 'analog-input':
-            self.__mcc_118()
-        else:
-            assert device_name == 'analog-input','device name: %r'%device_name
+        self.wrk_dir = wrk_dir
+        self.db_dir=db_dir
+        if not os.path.isdir(wrk_dir):
+            os.makedirs(wrk_dir)
 
-        return
-
-#*********************************************************************************
-# Private helper functions (internal use: __)
-#*********************************************************************************
-
-    def __mcc_118( self ):
+    def run(self ,channels=[0,2,4]):
         '''
-        IR 7040 "intelligent ratemeter from Mirion Tech. Inc.
+
         '''
-        filename = self.__wrk_dir+'/mcc_118_data.csv'
-        with open(filename,'w') as f:
-            f.write('')
+        filename = self.wrk_dir+'/mcc_118_data.csv'
+##        with open(filename,'w') as f:
+##            f.write('')
         hatlist = hat_list()
+        print(hatlist)
         for i in hatlist:
             ad = i.address
         hat = mcc118(ad)
         options = OptionFlags.DEFAULT
-        chan=0
-        avg=[]
         home=os.path.expanduser('~')
-        directory=home+'/IR7040_database'
+        directory=home+os.path.join(home,self.db_dir)
         if not os.path.isdir(directory):
             os.makedirs(directory)
+        avgs=dict()
         while True:
-            value = hat.a_in_read(0,options)
-            avg.append(value)
-            if len(avg)<100:
-                time.sleep(0.005)
+            for i in channels:
+                if str(i) not in avgs:
+                    avgs[str(i)] = []
+                value = hat.a_in_read(i,options)
+                avgs[str(i)].append(value)
+            if len(avgs[str(i)])<200:
+                len(avgs[str(i)])
+                time.sleep(0.00005)
                 continue
-            mean=sum(avg)/len(avg)
+            for i in channels:
+                i=str(i)
+                avgs[i] = sum(avgs[i])/len(avgs[i])
+            print(avgs)
+            avgs=dict()
+            continue
+            mean=dict()
+            for i in channels:
+                mean=sum(avg)/len(avg)
             avg=[]
-            #print(mean)
+            print(mean,value2,value4)
             timestamp=str(datetime.datetime.now())[:-7]
             filename2='{}/mcc_118_data_{}'.format(directory,str(datetime.datetime.now())[:10])
-            with open(filename,'w') as f:
-                f.write(str(mean))
+##            with open(filename,'w') as f:
+##                f.write(str(mean))
             with open(filename2,'a') as file:
                 file.write('{}, {}\n'.format(str(mean),timestamp))
-            if self.mccevent.isSet():
-                return
+##            if self.mccevent.isSet():
+##                return
 
 #======================= end class MCC118: =======================================
+if __name__=='__main__':
+    app = MCC_118()
+    app.run()
