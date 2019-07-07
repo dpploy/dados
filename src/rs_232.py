@@ -13,6 +13,7 @@ IR 7040 "intelligent ratemeter from Mirion Tech. Inc.
 #*********************************************************************************
 import os, sys, io, time, datetime, traceback, threading
 import logging, serial
+import pandas as pd
 
 from cortix.src.module import Module
 #*********************************************************************************
@@ -26,12 +27,14 @@ class RS_232(Module):
 # Construction 
 #*********************************************************************************
 
-    def __init__( self, wrk_dir='/tmp/dados',filename='ir_data'):
+    def __init__( self, wrk_dir='/tmp/dados',filename='ir_data',db_dir='IR_7040_db'):
         super().__init__() 
         self.filename=filename
-        if not os.path.isdir(wrk_dir):
-            os.makedirs(wrk_dir)
-        self.__wrk_dir = wrk_dir
+        self.wrk_dir = wrk_dir
+        self.db_dir = db_dir
+        for d in [self.wrk_dir,self.db_dir]:
+            if not os.path.isdir(wrk_dir):
+                os.makedirs(wrk_dir)
 
     def run(self,timeID=''):
         '''
@@ -44,14 +47,12 @@ class RS_232(Module):
         timeout = 5
         home = os.path.expanduser('~')
         directory=home+'/IR7040_database'
-        if not os.path.exists(directory):
-             os.makedirs(directory)
         ser = serial.Serial(port='/dev/ttyUSB0',baudrate=9600,timeout=5,
                             stopbits = serial.STOPBITS_ONE,
                             parity = serial.PARITY_NONE,
                             bytesize=serial.EIGHTBITS)
         olddata=''
-        tempfile='{}/{}{}.csv'.format(self.__wrk_dir,self.filename,timeID)
+        tempfile='{}/{}{}.csv'.format(self.wrk_dir,self.filename,timeID)
         while True:
             #Send request string, specific to IR7040
             ser.write('\r\nP0001 01245689BCDMNVWYZaOdghin 55}'.encode('ascii'))
@@ -67,6 +68,9 @@ class RS_232(Module):
             splitline.append(self.timestamp)
             for n in range(2,8):
                 splitline[n] = splitline[n][0]+'.'+splitline[n][1:3]+'e'+splitline[n][3:]
+                if not os.path.isfile(tempfile):
+                    with open(tempfile) as f:
+                        pass
 
 
 
