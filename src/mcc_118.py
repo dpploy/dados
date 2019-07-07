@@ -30,7 +30,6 @@ class MCC_118(Module):
     def __init__( self, wrk_dir='/tmp/dados',filename='mcc_data',db_dir='IR_7040_db'):
         super().__init__()
         self.fname = filename
-        print('MCC_118 class start')
         self.wrk_dir = wrk_dir
         home=os.path.expanduser('~')
         self.db_dir=os.path.join(home,db_dir)
