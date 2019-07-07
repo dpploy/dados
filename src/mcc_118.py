@@ -53,9 +53,12 @@ class MCC_118(Module):
         tempfile='{}/{}.csv'.format(self.wrk_dir,self.fname)
         if os.path.exists(tempfile):
             os.remove(tempfile)
+        check = True
         while True:
             self.timestamp = str(datetime.datetime.now())[:-7]
-            self.filename = os.path.join(self.db_dir,self.fname+str(datetime.datetime.now())[:10]+'.csv')
+            minutes=self.timestamp[14:19]
+            filetime = str(datetime.datetime.now())[:10]
+            self.filename = os.path.join(self.db_dir,self.fname+filetime+'.csv')
             for i in channels:
                 if str(i) not in avgs:
                     avgs[str(i)] = []
@@ -68,15 +71,15 @@ class MCC_118(Module):
             for i in channels:
                 i=str(i)
                 avgs[i] = sum(avgs[i])/len(avgs[i])
-            print(avgs)
             if not os.path.isfile(self.filename) :
                 header='Date and Time, '
                 with open(self.filename,'w') as f:
                     for i in channels:
                         header +='Chan {}, '.format(i)
-                    header+='\n'
+                    header+='\sn'
                     f.write(header)
             dataline = self.timestamp+', '
+            print(minutes)
             with open(self.filename,'a') as f:
                 for i in channels:
                     dataline += '{}, '.format(avgs[str(i)])
@@ -86,10 +89,12 @@ class MCC_118(Module):
             with open(self.filename) as f:
                 for line in f:
                     c+=1
-            if c >= 20:
-               
+            if minutes == '00' and check == True:              
                 self.df = pd.read_csv(self.filename)
                 self.send(self.df, mcc)
+                check == False
+            if minutes != '00':
+                check = True
             avgs=dict()
 
 #======================= end class MCC118: =======================================
