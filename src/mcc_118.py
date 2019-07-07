@@ -62,8 +62,8 @@ class MCC_118(Module):
             for i in channels:
                 i=str(i)
                 avgs[i] = sum(avgs[i])/len(avgs[i])
-            print(avgs)
-            self.send('test message',mcc)
+            #print(avgs)
+           # self.send('test message',mcc)
             avgs=dict()
 
 #======================= end class MCC118: =======================================

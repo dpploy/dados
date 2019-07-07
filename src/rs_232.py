@@ -53,6 +53,9 @@ class RS_232(Module):
                             bytesize=serial.EIGHTBITS)
         olddata=''
         tempfile='{}/{}{}.csv'.format(self.wrk_dir,self.filename,timeID)
+        rs = self.get_port('mcc')
+        if os.path.exists(tempfile):
+            os.remove(tempfile)
         while True:
             #Send request string, specific to IR7040
             ser.write('\r\nP0001 01245689BCDMNVWYZaOdghin 55}'.encode('ascii'))
@@ -68,12 +71,28 @@ class RS_232(Module):
             splitline.append(self.timestamp)
             for n in range(2,8):
                 splitline[n] = splitline[n][0]+'.'+splitline[n][1:3]+'e'+splitline[n][3:]
-                if not os.path.isfile(tempfile):
-                    with open(tempfile) as f:
-                        pass
-
-
-
+            line = ', '.join(splitline)+'\n'
+            if not os.path.isfile(tempfile):
+                with open(tempfile,'w') as f:
+                    f.write('Type, Callback, ch1_rate_filtered, ch1_rate_unfiltered, ch1_dose, ch1_alarm_high, ch1_alarm_low\
+                            , ch2_rate_filtered, ch2_rate_unfiltered, ch2_dose, ch2_alarm_high, ch2_alarm_low\
+                            , Leak Rate: Gallons/Day, Leak Rate: %Power Level\
+                            , ch3_rate_filtered, ch3_rate_unfiltered, ch3_dose, ch3_alarm_high, ch3_alarm_low\
+                            , ch4_rate_filtered, ch4_rate_unfiltered, ch4_dose, ch4_alarm_high, ch4_alarm_low\
+                            , Checksum, Probe Status, Date and Time\n')
+            with open(tempfile,'a') as f:
+                f.write(line)
+            c=0
+            with open(tempfile) as f:
+                for line in f:
+                    c+=1
+            print(c)
+            if c >= 5:
+                self.df = pd.read_csv(tempfile)
+                self.send(self.df,rs)
+                os.remove(tempfile)
+                     
+    
 
 if __name__=='__main__':
     app = RS_232()

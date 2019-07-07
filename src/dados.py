@@ -18,9 +18,9 @@ class Dados(Module):
         p2 = Port('mcc')
         p3 = Port('plot')
 
-        p1.connect(p3)
+        
         p2.connect(p3)
-
+        p1.connect(p3)
         self.rs232.add_port(p1)
         self.mcc118.add_port(p2)
         self.plot.add_port(p3)

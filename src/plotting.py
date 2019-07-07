@@ -33,12 +33,13 @@ class Plot(Module):
 
 
         '''
-        mcc = self.get_port('mcc')
-
+        #mcc = self.get_port('mcc')
+        rs = self.get_port('rs')
         while True:
-            line = self.recv(mcc)
-            print(line)
-            time.sleep(0.05)
+            #line = self.recv(mcc)
+            line2 = self.recv(rs)
+            print(line2)
+            time.sleep(0.01)
             
 
 if __name__=='__main__':
