@@ -27,6 +27,7 @@ class RS_232(Module):
 #*********************************************************************************
 
     def __init__( self, wrk_dir='/tmp/dados',filename='ir_data'):
+        super().__init__() 
         self.filename=filename
         if not os.path.isdir(wrk_dir):
             os.makedirs(wrk_dir)

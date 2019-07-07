@@ -28,6 +28,7 @@ class MCC_118(Module):
 #*********************************************************************************
 
     def __init__( self, wrk_dir='/tmp/dados',db_dir='IR_7040_db'):
+        super().__init__()
         print('MCC_118 class start')
         self.wrk_dir = wrk_dir
         home=os.path.expanduser('~')
@@ -47,7 +48,7 @@ class MCC_118(Module):
         hat = mcc118(ad)
         options = OptionFlags.DEFAULT
         avgs=dict()
-
+        mcc=self.get_port('mcc')
         while True:
             for i in channels:
                 if str(i) not in avgs:
@@ -62,8 +63,8 @@ class MCC_118(Module):
                 i=str(i)
                 avgs[i] = sum(avgs[i])/len(avgs[i])
             print(avgs)
+            self.send('test message',mcc)
             avgs=dict()
-            continue
 
 #======================= end class MCC118: =======================================
 
