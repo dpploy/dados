@@ -39,7 +39,7 @@ MANIFEST
 # Installer logs
 pip-log.txt
 pip-delete-this-directory.txt
-cortix.log
+src/cortix.log
 
 # Unit test / coverage reports
 htmlcov/
@@ -108,4 +108,4 @@ venv.bak/
 
 # mypy
 .mypy_cache/
-__pycache__
+src/__pycache__
