@@ -11,8 +11,8 @@
 MCC 118 DAQ GitHub repository.
 '''
 #*********************************************************************************
-import os, sys, io, time, datetime, traceback
-import logging
+import os, sys, io, time, datetime, traceback, logging
+import pandas as pd
 
 from daqhats import mcc118, OptionFlags, HatIDs, HatError, hat_list
 from cortix.src.module import Module
@@ -27,8 +27,9 @@ class MCC_118(Module):
 # Construction 
 #*********************************************************************************
 
-    def __init__( self, wrk_dir='/tmp/dados',db_dir='IR_7040_db'):
+    def __init__( self, wrk_dir='/tmp/dados',filename='mcc_data',db_dir='IR_7040_db'):
         super().__init__()
+        self.fname = filename
         print('MCC_118 class start')
         self.wrk_dir = wrk_dir
         home=os.path.expanduser('~')
@@ -48,22 +49,47 @@ class MCC_118(Module):
         hat = mcc118(ad)
         options = OptionFlags.DEFAULT
         avgs=dict()
-        mcc=self.get_port('mcc')
+        mcc=self.get_port('mcc-plot')
+        tempfile='{}/{}.csv'.format(self.wrk_dir,self.fname)
+        if os.path.exists(tempfile):
+            os.remove(tempfile)
         while True:
+            self.timestamp = str(datetime.datetime.now())[:-7]
+            self.filename = os.path.join(self.db_dir,self.fname+str(datetime.datetime.now())[:10]+'.csv')
             for i in channels:
                 if str(i) not in avgs:
                     avgs[str(i)] = []
                 value = hat.a_in_read(i,options)
                 avgs[str(i)].append(value)
-            if len(avgs[str(i)])<200:
+            if len(avgs[str(i)])<400:
                 len(avgs[str(i)])
                 time.sleep(0.00005)
                 continue
             for i in channels:
                 i=str(i)
                 avgs[i] = sum(avgs[i])/len(avgs[i])
-            #print(avgs)
-           # self.send('test message',mcc)
+            print(avgs)
+            if not os.path.isfile(self.filename) :
+                header='Date and Time, '
+                with open(self.filename,'w') as f:
+                    for i in channels:
+                        header +='Chan {}, '.format(i)
+                    header+='\n'
+                    f.write(header)
+            dataline = self.timestamp+', '
+            with open(self.filename,'a') as f:
+                for i in channels:
+                    dataline += '{}, '.format(avgs[str(i)])
+                dataline+='\n'
+                f.write(dataline)
+            c=0
+            with open(self.filename) as f:
+                for line in f:
+                    c+=1
+            if c >= 20:
+               
+                self.df = pd.read_csv(self.filename)
+                self.send(self.df, mcc)
             avgs=dict()
 
 #======================= end class MCC118: =======================================

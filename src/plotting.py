@@ -33,10 +33,11 @@ class Plot(Module):
 
 
         '''
-        #mcc = self.get_port('mcc')
-        rs = self.get_port('rs')
+        mcc = self.get_port('mcc-plot')
+        rs = self.get_port('rs-plot')
         while True:
-            #line = self.recv(mcc)
+            line = self.recv(mcc)
+            print(line)
             line2 = self.recv(rs)
             print(line2)
             time.sleep(0.01)

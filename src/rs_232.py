@@ -36,7 +36,7 @@ class RS_232(Module):
             if not os.path.isdir(wrk_dir):
                 os.makedirs(wrk_dir)
 
-    def run(self,timeID=''):
+    def run(self):
         '''
         IR 7040 "intelligent ratemeter from Mirion Tech. Inc.
         '''
@@ -52,8 +52,8 @@ class RS_232(Module):
                             parity = serial.PARITY_NONE,
                             bytesize=serial.EIGHTBITS)
         olddata=''
-        tempfile='{}/{}{}.csv'.format(self.wrk_dir,self.filename,timeID)
-        rs = self.get_port('mcc')
+        tempfile='{}/{}.csv'.format(self.wrk_dir,self.filename)
+        rs = self.get_port('rs-plot')
         if os.path.exists(tempfile):
             os.remove(tempfile)
         while True:
@@ -65,21 +65,21 @@ class RS_232(Module):
                 time.sleep(.25)
                 continue
             self.timestamp=str(datetime.datetime.now())[:-7]
-            print(line)
+            #print(line)
             olddata=line
+            line = self.timestamp+', '+line
             splitline=line.split()
-            splitline.append(self.timestamp)
             for n in range(2,8):
                 splitline[n] = splitline[n][0]+'.'+splitline[n][1:3]+'e'+splitline[n][3:]
             line = ', '.join(splitline)+'\n'
             if not os.path.isfile(tempfile):
                 with open(tempfile,'w') as f:
-                    f.write('Type, Callback, ch1_rate_filtered, ch1_rate_unfiltered, ch1_dose, ch1_alarm_high, ch1_alarm_low\
+                    f.write('Date and Time, Type, Callback, ch1_rate_filtered, ch1_rate_unfiltered, ch1_dose, ch1_alarm_high, ch1_alarm_low\
                             , ch2_rate_filtered, ch2_rate_unfiltered, ch2_dose, ch2_alarm_high, ch2_alarm_low\
                             , Leak Rate: Gallons/Day, Leak Rate: %Power Level\
                             , ch3_rate_filtered, ch3_rate_unfiltered, ch3_dose, ch3_alarm_high, ch3_alarm_low\
                             , ch4_rate_filtered, ch4_rate_unfiltered, ch4_dose, ch4_alarm_high, ch4_alarm_low\
-                            , Checksum, Probe Status, Date and Time\n')
+                            , Checksum, Probe Status\n')
             with open(tempfile,'a') as f:
                 f.write(line)
             c=0
