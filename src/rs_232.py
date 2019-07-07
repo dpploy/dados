@@ -27,7 +27,7 @@ class RS_232(Module):
 # Construction 
 #*********************************************************************************
 
-    def __init__( self, wrk_dir='/tmp/dados',filename='ir_data',db_dir='IR_7040_db'):
+    def __init__( self, wrk_dir='/tmp/dados',filename='ir_data',db_dir='IR_7040_database'):
         super().__init__() 
         self.fname = filename
         self.wrk_dir = wrk_dir
@@ -53,7 +53,7 @@ class RS_232(Module):
                             parity = serial.PARITY_NONE,
                             bytesize=serial.EIGHTBITS)
         olddata=''
-        tempfile='{}/{}.csv'.format(self.wrk_dir,self.filename)
+        tempfile='{}/{}.csv'.format(self.wrk_dir,self.fname)
         rs = self.get_port('rs-plot')
         check=True
         if os.path.exists(tempfile):
@@ -67,7 +67,7 @@ class RS_232(Module):
                 time.sleep(.25)
                 continue
             self.timestamp=str(datetime.datetime.now())[:-7]
-            minutes=self.timestamp[14:19]
+            minutes=self.timestamp[14:16]
             filetime = str(datetime.datetime.now())[:10]
             self.filename = os.path.join(self.db_dir,self.fname+filetime+'.csv')
 
@@ -81,15 +81,15 @@ class RS_232(Module):
             if not os.path.isfile(self.filename):
                 with open(self.filename,'w') as f:
                     f.write('Date and Time, Type, Callback, ch1_rate_filtered, ch1_rate_unfiltered, ch1_dose, ch1_alarm_high, ch1_alarm_low\
-                            , ch2_rate_filtered, ch2_rate_unfiltered, ch2_dose, ch2_alarm_high, ch2_alarm_low\
-                            , Leak Rate: Gallons/Day, Leak Rate: %Power Level\
-                            , ch3_rate_filtered, ch3_rate_unfiltered, ch3_dose, ch3_alarm_high, ch3_alarm_low\
-                            , ch4_rate_filtered, ch4_rate_unfiltered, ch4_dose, ch4_alarm_high, ch4_alarm_low\
-                            , Checksum, Probe Status\n')
+, ch2_rate_filtered, ch2_rate_unfiltered, ch2_dose, ch2_alarm_high, ch2_alarm_low\
+, Leak Rate: Gallons/Day, Leak Rate: %Power Level\
+, ch3_rate_filtered, ch3_rate_unfiltered, ch3_dose, ch3_alarm_high, ch3_alarm_low\
+, ch4_rate_filtered, ch4_rate_unfiltered, ch4_dose, ch4_alarm_high, ch4_alarm_low\
+                            , Checksum\n')
             with open(self.filename,'a') as f:
                 f.write(line)
-            if minutes == '00' and check == True:
-                self.df = pd.read_csv(self.filename)
+            if True: #minutes == '00' and check == True:
+                self.df = pd.read_csv(self.filename,sep=', ',engine='python')
                 self.send(self.df,rs)
                 check == False
             if minutes != '00' and check==False:

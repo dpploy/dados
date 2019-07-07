@@ -55,7 +55,7 @@ class MCC_118(Module):
         check = True
         while True:
             self.timestamp = str(datetime.datetime.now())[:-7]
-            minutes=self.timestamp[14:19]
+            minutes=self.timestamp[14:16]
             filetime = str(datetime.datetime.now())[:10]
             self.filename = os.path.join(self.db_dir,self.fname+filetime+'.csv')
             for i in channels:
@@ -78,7 +78,6 @@ class MCC_118(Module):
                     header+='\sn'
                     f.write(header)
             dataline = self.timestamp+', '
-            print(minutes)
             with open(self.filename,'a') as f:
                 for i in channels:
                     dataline += '{}, '.format(avgs[str(i)])

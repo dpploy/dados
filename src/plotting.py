@@ -18,7 +18,7 @@ from cortix.src.module import Module
 #*********************************************************************************
 
 class Plot(Module):
-    def __init__( self, wrk_dir='/tmp/dados',db_dir='IR_7040_db'):
+    def __init__( self, wrk_dir='/tmp/dados',db_dir='IR_7040_database'):
         super().__init__()
         self.wrk_dir = wrk_dir
         home=os.path.expanduser('~')
@@ -36,10 +36,15 @@ class Plot(Module):
         mcc = self.get_port('mcc-plot')
         rs = self.get_port('rs-plot')
         while True:
-            line = self.recv(mcc)
-            print(line)
-            line2 = self.recv(rs)
-            print(line2)
+            #line = self.recv(mcc)
+            #print(line)
+            rsdf = self.recv(rs)
+            print(rsdf)
+            for i in list(rsdf.columns.values):
+                print(i)
+            print(rsdf['ch3_dose'])
+            plot = rsdf.plot()
+            break
             time.sleep(0.01)
             
 
