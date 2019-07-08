@@ -73,26 +73,27 @@ class RS_232(Module):
 
             #print(line)
             olddata=line
-            line = self.timestamp+', '+line
+
             splitline=line.split()
-            for n in range(2,8):
+            for n in range(3,25):
                 splitline[n] = splitline[n][0]+'.'+splitline[n][1:3]+'e'+splitline[n][3:]
-            line = ', '.join(splitline)+'\n'
+            line = self.timestamp+', '+', '.join(splitline)+'\n'
+            print(line)
             if not os.path.isfile(self.filename):
                 with open(self.filename,'w') as f:
-                    f.write('Date and Time, Type, Callback, ch1_rate_filtered, ch1_rate_unfiltered, ch1_dose, ch1_alarm_high, ch1_alarm_low\
+                    f.write('Date and Time, Type, Callback, Status Group, ch1_rate_filtered, ch1_rate_unfiltered, ch1_dose, ch1_alarm_high, ch1_alarm_low\
 , ch2_rate_filtered, ch2_rate_unfiltered, ch2_dose, ch2_alarm_high, ch2_alarm_low\
 , Leak Rate: Gallons/Day, Leak Rate: %Power Level\
 , ch3_rate_filtered, ch3_rate_unfiltered, ch3_dose, ch3_alarm_high, ch3_alarm_low\
 , ch4_rate_filtered, ch4_rate_unfiltered, ch4_dose, ch4_alarm_high, ch4_alarm_low\
-                            , Checksum\n')
+, Probe_status, Checksum\n')
             with open(self.filename,'a') as f:
                 f.write(line)
-            if True: #minutes == '00' and check == True:
-                self.df = pd.read_csv(self.filename,sep=', ',engine='python')
+            if minutes == '59' and check == True:
+                self.df = pd.read_csv(self.filename,sep=', ',engine='python', index_col=False)
                 self.send(self.df,rs)
                 check == False
-            if minutes != '00' and check==False:
+            if minutes != '59' and check==False:
                 check = True
                      
     

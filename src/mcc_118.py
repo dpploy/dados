@@ -27,7 +27,7 @@ class MCC_118(Module):
 # Construction 
 #*********************************************************************************
 
-    def __init__( self, wrk_dir='/tmp/dados',filename='mcc_data',db_dir='IR_7040_db'):
+    def __init__( self, wrk_dir='/tmp/dados',filename='mcc_data',db_dir='IR_7040_database'):
         super().__init__()
         self.fname = filename
         self.wrk_dir = wrk_dir
@@ -77,21 +77,18 @@ class MCC_118(Module):
                         header +='Chan {}, '.format(i)
                     header+='\sn'
                     f.write(header)
-            dataline = self.timestamp+', '
+            dataline = self.timestamp
             with open(self.filename,'a') as f:
                 for i in channels:
-                    dataline += '{}, '.format(avgs[str(i)])
+                    dataline+=', '
+                    dataline += '{}'.format(avgs[str(i)])
                 dataline+='\n'
                 f.write(dataline)
-            c=0
-            with open(self.filename) as f:
-                for line in f:
-                    c+=1
-            if minutes == '00' and check == True:              
-                self.df = pd.read_csv(self.filename)
+            if minutes == '59' and check == True:              
+                self.df = pd.read_csv(self.filename,sep=', ',engine='python', index_col=False)
                 self.send(self.df, mcc)
                 check == False
-            if minutes != '00':
+            if minutes != '59':
                 check = True
             avgs=dict()
 
