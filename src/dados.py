@@ -8,25 +8,27 @@ from src.mcc_118 import MCC_118
 from src.plotting import Plot
 
 class Dados(Module):
+
     def __init__(self):
         self.cortix = Cortix()
         self.rs232 = RS_232()
         self.mcc118 = MCC_118()
         self.plot = Plot()
+
     def run(self):
         p1 = Port('rs')
         p2 = Port('mcc')
         p3 = Port('rs-plot')
         p4 = Port('mcc-plot')
-        
+
         p1.connect(p3)
-        p2.connect(p4) 
+        p2.connect(p4)
 
         self.rs232.add_port(p1)
         self.mcc118.add_port(p2)
         self.plot.add_port(p3)
         self.plot.add_port(p4)
-       
+
         self.cortix.add_module(self.rs232)
         self.cortix.add_module(self.mcc118)
         self.cortix.add_module(self.plot)
