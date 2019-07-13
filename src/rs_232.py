@@ -28,7 +28,8 @@ class RS_232(Module):
 #*********************************************************************************
 
     def __init__( self, wrk_dir='/tmp/dados',filename='ir_data',db_dir='IR_7040_database'):
-        super().__init__() 
+        super().__init__()
+
         self.fname = filename
         self.wrk_dir = wrk_dir
         home=os.path.expanduser('~')
@@ -95,8 +96,6 @@ class RS_232(Module):
                 check == False
             if minutes != '59' and check==False:
                 check = True
-                     
-    
 
 if __name__=='__main__':
     app = RS_232()
