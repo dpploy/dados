@@ -84,7 +84,7 @@ class Dados(Module):
                 split_line = line.split()
 
                 # Tne lines below need to be made general based on the user configuration 
-                # of the ir-7040
+                # of the ir-7040; I can't do this without logging into the stack pi.
                 for n in range(3,25):
                     splitline[n] = splitline[n][0]+'.'+splitline[n][1:3]+'e'+splitline[n][3:]
                 line = self.timestamp+', '+', '.join(split_line)+'\n'

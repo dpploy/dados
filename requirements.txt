@@ -1,5 +1,0 @@
-matplotlib
-serial
-numpy
-pandas
-cortix
