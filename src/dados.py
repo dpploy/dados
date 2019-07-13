@@ -60,7 +60,6 @@ class Dados(Module):
                                     parity=serial.PARITY_NONE,
                                     bytesize=serial.EIGHTBITS )
 
-
         # Start MCC 118 interface
         if mcc_118_port:
             pass
