@@ -2,30 +2,35 @@
 # -*- coding: utf-8 -*-
 # This file is part of the Cortix toolkit environment
 # https://cortix.org
+'''
+Cortix run file for DADOS using the IR-7040 gas ratemeter RS-232 interface.
 
-from cortix.src.module import Module
-from cortix.src.port import Port
-from cortix.util.dataplot import DataPlot
+'''
+
 from cortix.src.cortix_main import Cortix
+from cortix.src.network import Network
+
+from cortix.util.dataplot import DataPlot
 
 from ..src.dados import Dados
 
-'''
-Cortix run file for DADOS using the IR-7040 gas ratemeter RS-232 interface.
-'''
+def main():
+    '''
+    Description of the run file.
 
-if __name__ == "__main__":
+    '''
 
     # Parameters
     time_step  = 0.1
 
-    cortix = Cortix(use_mpi=False)
+    ir_7040 = Cortix(splash=True)
+    ir_7040.network = Network()
+
+    ir_7040_net = ir_7040.network
 
     # DADOS module.
     dados = Dados()
-    # Port def.
-    rs232_port = Port('rs-232')
-    dados.add_port(rs232_port)
+    ir_7040_net.module(dados)
     dados.rs232_filename = 'ir-7040'
     dados.rs232_request_string = '\r\nP0001 01245689BCDMNVWYZaOdghin 55}'
 
@@ -33,16 +38,16 @@ if __name__ == "__main__":
     data_plot = DataPlot()
     data_plot.title = 'IR-7040 Data Acquisition'
     data_plot.dpi = 300
-    # Port def.
-    plot_port = Port('viz-data')
-    data_plot.add_port(plot_port)
 
     # Network connectivity
+
+    ir_7040_net.connect( [dados,'rs-232'], [data_plot,'viz-data'] )
     rs232_port.connect(plot_port)
 
-    # Add modules to Cortix
-    cortix.add_module(dados)
-    cortix.add_module(data_plot)
+    ir_7040_net.draw()
 
     # Run application
-    cortix.run()
+    ir_7040.run()
+
+if __name__ == "__main__":
+    main()
