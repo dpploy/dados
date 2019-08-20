@@ -5,9 +5,8 @@
 
 import time
 import numpy as np
+
 from cortix.src.module import Module
-from src.rs_232 import RS_232
-from src.mcc_118 import MCC_118
 
 class Dados(Module):
     '''
@@ -17,6 +16,7 @@ class Dados(Module):
     =====
     rs-232:
     mcc-118:
+
     '''
 
     def __init__(self):
@@ -43,6 +43,8 @@ class Dados(Module):
         self.rs232_request_string_encoding = 'ascii'
 
         # MCC 118 configuration
+
+        #self.state = somedata
 
     def run(self):
 
@@ -72,7 +74,7 @@ class Dados(Module):
             if rs_232_port:
 
                 # Send request string to the rs-232
-                rs_232.write(self.rs232_request_string.encode(self.rs232_request_string_encoding))
+                rs_232.write( self.rs232_request_string.encode(self.rs232_request_string_encoding))
                 line = rs_232.readline()
                 line = str(line.decode('utf-8', errors='replace').strip())
 
@@ -81,7 +83,7 @@ class Dados(Module):
                 filetime = str(datetime.datetime.now())[:10]
                 self.filename = os.path.join(self.db_dir,self.fname+filetime+'.csv')
 
-                split_line = line.split()
+                split_line = line.split(' ')
 
                 # Tne lines below need to be made general based on the user configuration 
                 # of the ir-7040; I can't do this without logging into the stack pi.
