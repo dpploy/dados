@@ -1,4 +1,4 @@
-# Dados
+# DADOS
 
     Data Acquisition and Distribution for Offline Systems (DADOS)
     
