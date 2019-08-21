@@ -12,42 +12,42 @@ from cortix.src.network import Network
 
 from cortix.examples.dataplot import DataPlot
 
-from ..dados import Dados
+import dados
 
-def main():
-    '''
-    Description of the run file.
 
-    '''
+class Dados_Run:
+    def __init__(self):
+        '''
+        Example DADOS run file that demonstrates how to build a Cortix
+        Application
 
-    # Parameters
-    time_step  = 0.1
+        '''
 
-    ir_7040 = Cortix(splash=True)
-    ir_7040.network = Network()
+        # Parameters
+        time_step  = 0.1
 
-    ir_7040_net = ir_7040.network
+        self.cortix = Cortix(splash=True)
+        self.cortix.network = Network()
 
-    # DADOS module.
-    dados = Dados()
-    ir_7040_net.module(dados)
-    dados.rs232_filename = 'ir-7040'
-    dados.rs232_request_string = '\r\nP0001 01245689BCDMNVWYZaOdghin 55}'
+        self.net = self.cortix.network
 
-    # DataPlot module.
-    data_plot = DataPlot()
-    data_plot.title = 'IR-7040 Data Acquisition'
-    data_plot.dpi = 300
+        # DADOS module
+        ir_7040 = dados.IR_7040(command_string='12489BOdg')
+        self.ir_dados = dados.Dados(device=ir_7040)
+        self.net.module(self.ir_dados)
+##        # DataPlot module
+        self.data_plot = DataPlot()
+        self.data_plot.title = 'IR-7040 Data Acquisition'
+        self.data_plot.dpi = 300
+        self.net.add_module(self.data_plot)
+        
 
-    # Network connectivity
-
-    ir_7040_net.connect( [dados,'rs-232'], [data_plot,'viz-data'] )
-    rs232_port.connect(plot_port)
-
-    ir_7040_net.draw()
-
-    # Run application
-    ir_7040.run()
-
+        
+        
+    def start(self):
+        self.net.connect( [self.ir_dados,'rs-232'], [self.data_plot,'viz-data'] )
+        # Run application
+        #self.cortix.run()
 if __name__ == "__main__":
-    main()
+    app = Dados_Run()
+    app.start()
