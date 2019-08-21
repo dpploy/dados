@@ -10,9 +10,9 @@ Cortix run file for DADOS using the IR-7040 gas ratemeter RS-232 interface.
 from cortix.src.cortix_main import Cortix
 from cortix.src.network import Network
 
-from cortix.util.dataplot import DataPlot
+from cortix.examples.dataplot import DataPlot
 
-from ..src.dados import Dados
+from ..dados import Dados
 
 def main():
     '''
