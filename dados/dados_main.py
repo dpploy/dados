@@ -55,6 +55,6 @@ class Dados(Module):
             line = self.device.read_line()
             print(line)
             for port in self.ports:
-                self.send(port,line)
+                self.send(line,port)
             
 

@@ -32,7 +32,7 @@ class Dados_Run:
         self.net = self.cortix.network
 
         # DADOS module
-        ir_7040 = dados.IR_7040(command_string='12489BOdg')
+        ir_7040 = dados.IR_7040()
         self.ir_dados = dados.Dados(device=ir_7040)
         self.net.module(self.ir_dados)
 ##        # DataPlot module
@@ -47,7 +47,7 @@ class Dados_Run:
     def start(self):
         self.net.connect( [self.ir_dados,'rs-232'], [self.data_plot,'viz-data'] )
         # Run application
-        #self.cortix.run()
+        self.cortix.run()
 if __name__ == "__main__":
     app = Dados_Run()
     app.start()

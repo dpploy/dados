@@ -8,18 +8,29 @@ class IR_7040(threading.Thread):
         self.command_string = command_string
         self.request_string = self.create_command(command_string)
         print(self.request_string)
-##        self.ser = serial.Serial(port='/dev/ttyUSB0',baudrate=9600,timeout=5,
-##                            stopbits = serial.STOPBITS_ONE,
-##                            parity =IR_ serial.PARITY_NONE,
-##                            bytesize=serial.EIGHTBITS)
+        self.ser = serial.Serial(port='/dev/ttyUSB0',baudrate=9600,timeout=5,
+                            stopbits = serial.STOPBITS_ONE,
+                            parity =serial.PARITY_NONE,
+                            bytesize=serial.EIGHTBITS)
         self.df = dict()
+        self.splitter = ' '
         self.make_header()
         
     def read_line(self):
-        #self.timestamp=str(datetime.datetime.now())[:-7]
-        #line = ser.readline.decode()
-        line = 'Hello'
-        return line
+        self.timestamp=str(datetime.datetime.now())[:-7]
+        self.ser.write(self.request_string.encode())
+        line = self.ser.readline().decode()
+        data = line.split(self.splitter)[3:-1]
+        print(data)
+        for c,i in enumerate(data):
+            try:
+                i = float(i[0]+'.'+i[1:3]+'e'+i[3:])
+            except Exception as e:
+                print(traceback.format_exc())
+            print(i)
+            self.df[self.headers[c]].append(i)
+        return self.df
+
     def create_command(self,string):
 
         CR='\r'
@@ -76,8 +87,9 @@ class IR_7040(threading.Thread):
         dic['h'] = 'Rate Alarm: High'
         dic['i'] = 'Rate Alarm: Warning (chan 4)'
         dic['n'] = 'Probe Status'
-        header = ''
+        self.headers = []
         for s in self.command_string:
+            self.headers.append(dic[s])
             assert s in dic, "Error, {} not a recognized command string".format(s)
             self.df[dic[s]] = []
         print(self.df)
@@ -120,9 +132,8 @@ Full command list and descriptions:
     'i = Rate Alarm: Warning (chan 4)'
     'n'='Probe Status'
 """)
-    def __del__(self):
-        return
+    def close(self):
         try:
             self.ser.close()
         except Exception as e:
-            print(traceback.print_exc())
+            print(traceback.format_exc())
