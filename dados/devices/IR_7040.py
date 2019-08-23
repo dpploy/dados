@@ -12,6 +12,7 @@ class IR_7040(threading.Thread):
                             stopbits = serial.STOPBITS_ONE,
                             parity =serial.PARITY_NONE,
                             bytesize=serial.EIGHTBITS)
+        self.oldline = ''
         self.df = dict()
         self.splitter = ' '
         self.make_header()
@@ -19,16 +20,33 @@ class IR_7040(threading.Thread):
     def read_line(self):
         self.timestamp=str(datetime.datetime.now())[:-7]
         self.ser.write(self.request_string.encode())
-        line = self.ser.readline().decode()
-        data = line.split(self.splitter)[3:-1]
-        print(data)
-        for c,i in enumerate(data):
-            try:
-                i = float(i[0]+'.'+i[1:3]+'e'+i[3:])
-            except Exception as e:
-                print(traceback.format_exc())
-            print(i)
-            self.df[self.headers[c]].append(i)
+        line = self.ser.readline().decode().strip()
+        return line
+
+    def read_lines(self,lines=2):
+        assert isinstance(lines,int), "Number of lines must be integer"
+        self.df = dict()
+        counter=0
+        while counter < lines:
+            self.timestamp=str(datetime.datetime.now())[:-7]
+            self.ser.write(self.request_string.encode())
+            line = self.ser.readline().decode().strip()
+            if line == self.oldline:
+                continue
+            self.oldline=line
+            counter +=1
+            data = line.split(self.splitter)[3:-1]
+            if 'Timestamp' not in self.df:
+                self.df['Timestamp'] = []
+            self.df['Timestamp'].append(self.timestamp)
+            for c,i in enumerate(data):
+                try:
+                    i = float(i[0]+'.'+i[1:3]+'e'+i[3:])
+                except Exception as e:
+                    print(traceback.format_exc())
+                if self.headers[c] not in self.df:
+                    self.df[self.headers[c]] = []
+                self.df[self.headers[c]].append(i)
         return self.df
 
     def create_command(self,string):
@@ -92,7 +110,7 @@ class IR_7040(threading.Thread):
             self.headers.append(dic[s])
             assert s in dic, "Error, {} not a recognized command string".format(s)
             self.df[dic[s]] = []
-        print(self.df)
+    
     def help(self):
         print("""
 Many commands are not implemented in the IR-7040

@@ -39,7 +39,7 @@ class Dados(Module):
         self.rs232_timeout = 5
         self.rs232_request_string = 'rs232-null-request-string'
         self.rs232_request_string_encoding = 'ascii'
-
+        self.number_of_data_lines = 20
         # MCC 118 configuration
 
         #self.state = somedata
@@ -52,7 +52,7 @@ class Dados(Module):
             
             time.sleep( self.time_step )
 
-            line = self.device.read_line()
+            line = self.device.read_lines(lines=self.number_of_data_lines)
             print(line)
             for port in self.ports:
                 self.send(line,port)
