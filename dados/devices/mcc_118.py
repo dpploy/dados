@@ -13,6 +13,10 @@ MCC 118 DAQ GitHub repository.
 #*********************************************************************************
 import os, sys, io, time, datetime, traceback, logging
 import pandas as pd
+try:
+    from daqhats import mcc118, OptionFlags, HatIDs, HatError, hat_list
+except ModuleNotFoundError as e:
+    pass
 
 from cortix.src.module import Module
 #*********************************************************************************
@@ -25,24 +29,19 @@ class MCC_118(Module):
 #*********************************************************************************
 # Construction 
 #*********************************************************************************
-
-    def __init__( self, wrk_dir='/tmp/dados',filename='mcc_data',db_dir='IR_7040_database'):
+    def __init__( self, channels=[]):
         super().__init__()
         try:
-            from daqhats import mcc118, OptionFlags, HatIDs, HatError, hat_list
-        except ModuleNotFoundError as e:
-            print(traceback.format_exc())
+            import daqhats
+        except:
             print("DAQHats library not installed, download from source at: https://github.com/mccdaq/daqhats")
             return
-        self.fname = filename
-        self.wrk_dir = wrk_dir
-        home=os.path.expanduser('~')
-        self.db_dir=os.path.join(home,db_dir)
-        for d in [self.wrk_dir,self.db_dir]:
-            if not os.path.isdir(d):
-                os.makedirs(d)
-
-    def run(self ,channels=[0,2,4]):
+        self.channels = channels
+        if self.channels==[]:
+            self.channels=[f for f in range(8)]
+        self.running_avg=400
+    
+    def read_lines(self, lines=2):
         '''
         Run class that will be called by Cortix
         Returns data in predetermined format (format undecided)
@@ -53,52 +52,33 @@ class MCC_118(Module):
         hat = mcc118(ad)
         options = OptionFlags.DEFAULT
         avgs=dict()
-        mcc=self.get_port('mcc-plot')
-        tempfile='{}/{}.csv'.format(self.wrk_dir,self.fname)
-        if os.path.exists(tempfile):
-            os.remove(tempfile)
+        datadic = {}
         check = True
-        while True:
-            self.timestamp = str(datetime.datetime.now())[:-7]
-            minutes=self.timestamp[14:16]
-            filetime = str(datetime.datetime.now())[:10]
-            self.filename = os.path.join(self.db_dir,self.fname+filetime+'.csv')
-            for i in channels:
-                if str(i) not in avgs:
-                    avgs[str(i)] = []
+        counter=0
+        while counter<lines:
+            for i in self.channels:
+                name = 'Channel: '+str(i)
+                if name not in avgs:
+                    avgs[name] = []
                 value = hat.a_in_read(i,options)
-                avgs[str(i)].append(value)
-            if len(avgs[str(i)])<400:
-                len(avgs[str(i)])
+                avgs[name].append(value)
+            if len(avgs[name])<self.running_avg:
                 time.sleep(0.00005)
                 continue
-            for i in channels:
-                i=str(i)
+            counter +=1
+            self.timestamp = str(datetime.datetime.now())[:-7] 
+            if 'Timestamp' not in datadic:
+                datadic['Timestamp'] = []
+            datadic['Timestamp'].append(self.timestamp)
+            for i in avgs:
                 avgs[i] = sum(avgs[i])/len(avgs[i])
-            if not os.path.isfile(self.filename) :
-                header='Date and Time, '
-                with open(self.filename,'w') as f:
-                    for i in channels:
-                        header +='Chan {}, '.format(i)
-                    header+='\sn'
-                    f.write(header)
-            dataline = self.timestamp
-            with open(self.filename,'a') as f:
-                for i in channels:
-                    dataline+=', '
-                    dataline += '{}'.format(avgs[str(i)])
-                dataline+='\n'
-                f.write(dataline)
-            if minutes == '59' and check == True:              
-                self.df = pd.read_csv(self.filename,sep=', ',engine='python', index_col=False)
-                self.send(self.df, mcc)
-                check == False
-            if minutes != '59':
-                check = True
+                if i not in datadic:
+                    datadic[i] = []
+                datadic[i].append(avgs[i])
             avgs=dict()
-
+        return datadic
 #======================= end class MCC118: =======================================
 
 if __name__=='__main__':
     app = MCC_118()
-    app.run()
+    print(app.run())

@@ -7,7 +7,6 @@ class IR_7040(threading.Thread):
     def __init__(self,port='/dev/ttyUSB0',baudrate=9600,timeout=5,command_string='12489BOdg'):
         self.command_string = command_string
         self.request_string = self.create_command(command_string)
-        print(self.request_string)
         self.ser = serial.Serial(port='/dev/ttyUSB0',baudrate=9600,timeout=5,
                             stopbits = serial.STOPBITS_ONE,
                             parity =serial.PARITY_NONE,
@@ -31,11 +30,14 @@ class IR_7040(threading.Thread):
             self.timestamp=str(datetime.datetime.now())[:-7]
             self.ser.write(self.request_string.encode())
             line = self.ser.readline().decode().strip()
+            #print(self.request_string)
+            #print(line)
             if line == self.oldline:
+                time.sleep(0.6)
                 continue
             self.oldline=line
             counter +=1
-            data = line.split(self.splitter)[3:-1]
+            data = line.split(self.splitter)[2:-1]
             if 'Timestamp' not in self.df:
                 self.df['Timestamp'] = []
             self.df['Timestamp'].append(self.timestamp)
@@ -71,6 +73,7 @@ class IR_7040(threading.Thread):
         checksum = hex(checksum).upper()[2:]
         complete_command=command+checksum+'}'
         return complete_command
+
     def make_header(self):
         dic = {}
         dic['P'] ='Send requested values'
@@ -110,7 +113,7 @@ class IR_7040(threading.Thread):
             self.headers.append(dic[s])
             assert s in dic, "Error, {} not a recognized command string".format(s)
             self.df[dic[s]] = []
-    
+
     def help(self):
         print("""
 Many commands are not implemented in the IR-7040

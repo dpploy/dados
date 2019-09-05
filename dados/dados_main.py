@@ -23,9 +23,6 @@ class Dados(Module):
     def __init__(self, device=None, timestep=0.1,command_string=None):
         super().__init__()
         print('dados_main init')
-        self.initial_time = 0.0
-        self.end_time     = np.inf
-        self.time_step    = timestep
         self.device = device
         if isinstance(self.device,str):
             if device.lower() == 'ir_7040':
@@ -34,27 +31,20 @@ class Dados(Module):
                 self.device = dados.MCC_118
         # RS-232 default configuration
 
-        self.rs232_dev = '/dev/ttyUSB0'
-        self.rs232_baud_rate = 9600
-        self.rs232_timeout = 5
-        self.rs232_request_string = 'rs232-null-request-string'
-        self.rs232_request_string_encoding = 'ascii'
-        self.number_of_data_lines = 20
+        self.number_of_data_lines = 5
         # MCC 118 configuration
-
+        self.time_range = 10
         #self.state = somedata
 
     def run(self):
 
-
+        self.endtime = datetime.datetime.now()+datetime.timedelta(seconds=self.time_range)
         # Evolve daq_time    
-        while True:
+        while datetime.datetime.now()<=self.endtime:
             
-            time.sleep( self.time_step )
-
             line = self.device.read_lines(lines=self.number_of_data_lines)
-            print(line)
             for port in self.ports:
                 self.send(line,port)
-            
-
+        for port in self.ports:
+            self.send('Done', port)
+        
